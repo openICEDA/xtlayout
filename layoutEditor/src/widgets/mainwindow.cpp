@@ -9,13 +9,12 @@
 #include <QToolButton>
 #include "drawcommand.h"
 #include "rectangletool.h"
-
+#include "selectiontool.h"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , mUiState(NO_ACTIVE_TOOL_STATE), ui(new Ui::MainWindow)
+    , mUiState(NO_ACTIVE_TOOL_STATE), ui(new Ui::MainWindow), mPA(new PaintingArea(this)), mSelectionTool(mPA)
 {
     ui->setupUi(this);
-    mPA = new PaintingArea(this);
     setCentralWidget(mPA);
     QToolButton *rectToolButton = new QToolButton(this);
     QToolButton *selectToolButton = new QToolButton(this);
@@ -25,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     rectToolButton->setShortcut(QKeySequence("R"));
     selectToolButton->setText("Select");
     connect(rectToolButton, SIGNAL(clicked()), this, SLOT(newRectangleTool()));
+    connect(selectToolButton, SIGNAL(clicked()), this, SLOT(newRectangleTool()));
+    mPA->setTool(&mSelectionTool);
     qApp->installEventFilter(this);
 }
 
@@ -34,67 +35,35 @@ void MainWindow::paintEvent(QPaintEvent *)
 
 void MainWindow::newRectangleTool()
 {
-    if(nullptr == mPA->getTool())
+    if (mPA->getTool()->getToolType() == Tool::SELECTION_TOOL)
     {
-        mPA->setTool(new RectangleTool(mPA));
+        mSelectionTool.resetSelectionBox();
+        mPA->update();
     }
+    RectangleTool *rectangleTool = new RectangleTool(mPA);
+    mPA->setTool(rectangleTool);
+    connect(rectangleTool, SIGNAL(completed()), this, SLOT(switchBackToSelectionTool()));
+}
+
+void MainWindow::switchBackToSelectionTool()
+{
+    mPA->deleteTool();
+    mPA->setTool(&mSelectionTool);
+}
+
+void MainWindow::newSelectionTool()
+{
+    mPA->setTool(&mSelectionTool);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
     return false;
-//    if(mUiState == NO_ACTIVE_TOOL_STATE)
-//    {
-//        if(event->type() == QEvent::KeyPress || event->type() == QEvent::MouseButtonPress)
-//        {
-//            if(key or button activates a tool)
-//            {
-//                mUiState = INTERMEDIATE_STATE;
-//            }
-//        }
-//        return true;
-//    }
-//    else if(mUiState == INTERMEDIATE_STATE)
-//    {
-//        if(event->type() == QEvent::KeyRelease)
-//        {
-//            QKeyEvent *event = static_cast<QKeyEvent*>(event);
-//            mPA->setTool(tool(event->key()));
-//            mUiState = TOOL_ACTIVE_STATE;
-//        }
-//        else if(event->type() == QEvent::MouseButtonRelease)
-//        {
-//            QMouseEvent *event = static_cast<QMouseEvent*>(event);
-//            if(event->pos() within a tool button)
-//            {
-//                mPA->setTool(tool(event->pos()));
-//                mUiState = TOOL_ACTIVE_STATE;
-//            }
-//            else
-//            {
-//                mUiState = NO_ACTIVE_TOOL_STATE;
-//            }
-//        }
-//        return true;
-//    }
-//    else if(mUiState == TOOL_ACTIVE_STATE)
-//    {
-
-//    }
-//    else
-//    {
-
-//    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-//    if(nullptr != mPA->getTool())
-//    {
-//        mPA->getTool()->keyPressEvent(event);
-//    }
 }
-
 MainWindow::~MainWindow()
 {
     delete ui;

@@ -9,22 +9,15 @@
 #include "rectangle.h"
 #include "quadtreenode.h"
 #include "globalsetting.h"
+
 PaintingArea::PaintingArea(QWidget *parent)
-    : QWidget{parent}, mTool(nullptr), mQuadtree(0, QRect(QPoint(0, 0), GlobalSetting::canvasSize))
+    : QWidget{parent}, mQuadtree(QRect(QPoint(0, 0), GlobalSetting::canvasSize))
 {
-    insertVisualEntity(new Grid);
-    QuadtreeNode<Rectangle> qtn(2, QRect(0,0,200,200));
-    qtn.insert(QSharedPointer<Rectangle>(new Rectangle(0, 0, 50, 50)));
-    qtn.insert(QSharedPointer<Rectangle>(new Rectangle(50, 50, 50, 50)));
-    qtn.insert(QSharedPointer<Rectangle>(new Rectangle(100, 100, 50, 50)));
-
-    QList<Rectangle*> res;
-    qtn.getAllObjsOfSubtree(res);
-    for(typename QList<Rectangle*>::iterator it = res.begin(); it != res.end(); it++)
-    {
-        insertVisualEntity((*it));
-    }
-
+    insertVisualEntity(std::shared_ptr<VisualEntity>(new Grid));
+    //load gds2 file into quadtree, the coordinates in gds2 is in global coordinate system.
+    //there should exist another data structure to store the shapes inside view ports. After loading
+    // all shapes into quadtree, i search for the shapes inside view ports and store the result in this
+    // new data structre
     update();
 }
 
@@ -32,11 +25,8 @@ void PaintingArea::paintEvent(QPaintEvent *)
 {
     //TODO: Seperate the drawer
     QPainter painter(this);
-    QPen pen;
-    pen.setBrush(QBrush(QColor(0,255,0,255)));
-    painter.setPen(pen);
 
-    QSet<QSharedPointer<VisualEntity>>::const_iterator visualEntityIter = mAllVisualEntities.constBegin();
+    QSet<std::shared_ptr<VisualEntity>>::const_iterator visualEntityIter = mAllVisualEntities.constBegin();
     while (visualEntityIter != mAllVisualEntities.constEnd()) {
         (*visualEntityIter)->draw(&painter);
         ++visualEntityIter;
@@ -67,16 +57,14 @@ void PaintingArea::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void PaintingArea::insertVisualEntity(VisualEntity *pVisualEntity)
+void PaintingArea::insertVisualEntity(std::shared_ptr<VisualEntity> pVisualEntity)
 {
-    QSharedPointer<VisualEntity> tempVisualEntity;
-    tempVisualEntity.reset(pVisualEntity);
-    mAllVisualEntities.insert(std::move(tempVisualEntity));
+    mAllVisualEntities.insert(std::move(pVisualEntity));
 }
 
 void PaintingArea::deleteVisualEntity(VisualEntity *pVisualEntity)
 {
-    mAllVisualEntities.erase(mAllVisualEntities.find(QSharedPointer<VisualEntity>(pVisualEntity)));
+    mAllVisualEntities.erase(mAllVisualEntities.find(std::shared_ptr<VisualEntity>(pVisualEntity)));
 //    mQuadtree.erase(mAllVisualEntities.find(pVisualEntity));
 }
 

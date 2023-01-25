@@ -8,8 +8,10 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 #include"commandcontrol.h"
 #include<QSet>
+#include"selectiontool.h"
 class PaintingArea;
 class Shape;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -17,10 +19,12 @@ public:
     void paintEvent(QPaintEvent *) override;
     void keyPressEvent(QKeyEvent *) override;
     bool eventFilter(QObject *obj, QEvent *event) override;
+    void newSelectionTool();
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 public slots:
     void newRectangleTool();
+    void switchBackToSelectionTool();
 private:
     enum ui_state{
         NO_ACTIVE_TOOL_STATE,
@@ -28,7 +32,8 @@ private:
         TOOL_ACTIVE_STATE
     };
     ui_state mUiState;
-    PaintingArea *mPA;
     Ui::MainWindow *ui;
+    PaintingArea *mPA;
+    SelectionTool mSelectionTool;
 };
 #endif // MAINWINDOW_H

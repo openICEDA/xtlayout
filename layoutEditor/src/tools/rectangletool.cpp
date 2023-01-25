@@ -9,7 +9,7 @@
 #include "paintingarea.h"
 #include "quadtreenode.h"
 
-RectangleTool::RectangleTool(PaintingArea *pPA):mFirstPointFixed(false),mRectangle(nullptr),mPA(pPA)
+RectangleTool::RectangleTool(PaintingArea *pPA):mFirstPointFixed(false), mRectangle(nullptr), mPA(pPA), Tool(RECTANGLE_TOOL)
 {
 
 }
@@ -20,15 +20,15 @@ void RectangleTool::mousePressEvent(QMouseEvent *event)
     {
         mPA->setMouseTracking(true);
         mFirstPointFixed = true;
-        mRectangle = QSharedPointer<Rectangle>(new Rectangle(event->pos(),event->pos()));
+        mRectangle = std::shared_ptr<Rectangle>(new Rectangle(event->pos(), event->pos()));
         QuadtreeNode<Rectangle> &quadtree = mPA->getQuadTree(); //TODO: it is not elegant to let custom to initialize a tree node, compare with better solution
         quadtree.insert(mRectangle);
-        mPA->insertVisualEntity(mRectangle.get());
+        mPA->insertVisualEntity(mRectangle);
     }
     else
     {
         mPA->setMouseTracking(false);
-        mPA->deleteTool();
+        emit completed();
     }
 }
 

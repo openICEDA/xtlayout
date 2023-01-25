@@ -1,6 +1,6 @@
 #include "tool.h"
 
-Tool::Tool()
+Tool::Tool(tool_type pToolType)
 {
 
 }
