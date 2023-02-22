@@ -5,21 +5,21 @@
 #include "visualentity.h"
 #include <memory>
 #include <QDebug>
-
+//TODO:是不是可以判断T是不是指针，决定->还是.s
 template <typename T>
 class QuadtreeNode
 {
 public:
-    QuadtreeNode(const QRect &pZone, int pLevel = 0);
+    QuadtreeNode(const QRect& pZone, int pLevel = 0);
     ~QuadtreeNode(){};
-    bool contains(const QRect &pZone) const;
-    bool intersects(const QRect &pZone) const;
-    void insert(std::shared_ptr<T> pObj);
-    void search(const QRect &pZone, QSet<std::shared_ptr<T>> &foundObjs);
-    void getAllObjsOfSubtree(QSet<std::shared_ptr<T>> &pResList);
-    void resize(const QRect &pZone);
+    bool contains(const QRect& pZone) const;
+    bool intersects(const QRect& pZone) const;
+    void insert(const T& pObj);
+    void search(const QRect& pZone, QSet<T>& foundObjs); //TODO:is QSet<T&> better?
+    void getAllObjsOfSubtree(QSet<T>& pResList);
+    void resize(const QRect& pZone);
     QRect mZone;
-    QSet<std::shared_ptr<T>> mObjs;
+    QSet<T> mObjs;
     int mLevel;
     static const int maxLevel;
     std::unique_ptr<QuadtreeNode<T>> mChildren[4];
@@ -30,7 +30,7 @@ template <typename T>
 const int QuadtreeNode<T>::maxLevel = 1;
 
 template <typename T>
-QuadtreeNode<T>::QuadtreeNode(const QRect &pZone, int pLevel):
+QuadtreeNode<T>::QuadtreeNode(const QRect& pZone, int pLevel):
     mLevel(pLevel), mZone(pZone),
     mChildrenZones{
         {mZone.left() + mZone.width()/2, mZone.top(), mZone.width()/2, mZone.height()/2},
@@ -42,7 +42,7 @@ QuadtreeNode<T>::QuadtreeNode(const QRect &pZone, int pLevel):
 }
 
 template <typename T>
-void QuadtreeNode<T>::resize(const QRect &pZone)
+void QuadtreeNode<T>::resize(const QRect& pZone)
 {
 
 }
@@ -54,7 +54,7 @@ void QuadtreeNode<T>::resize(const QRect &pZone)
 //}
 
 template <typename T>
-bool QuadtreeNode<T>::contains(const QRect &pZone) const
+bool QuadtreeNode<T>::contains(const QRect& pZone) const
 {
     if(mZone.contains(pZone))
     {
@@ -67,7 +67,7 @@ bool QuadtreeNode<T>::contains(const QRect &pZone) const
 }
 
 template <typename T>
-bool QuadtreeNode<T>::intersects(const QRect &pZone) const
+bool QuadtreeNode<T>::intersects(const QRect& pZone) const
 {
     if(mZone.intersects(pZone))
     {
@@ -80,7 +80,7 @@ bool QuadtreeNode<T>::intersects(const QRect &pZone) const
 }
 
 template <typename T>
-void QuadtreeNode<T>::insert(std::shared_ptr<T> pObj)
+void QuadtreeNode<T>::insert(const T& pObj)
 {
     if(!contains(pObj->getZone()))
     {
@@ -108,9 +108,9 @@ void QuadtreeNode<T>::insert(std::shared_ptr<T> pObj)
 }
 
 template <typename T>
-void QuadtreeNode<T>::search(const QRect &pZone, QSet<std::shared_ptr<T>> &foundObjs)
+void QuadtreeNode<T>::search(const QRect& pZone, QSet<T>& foundObjs)
 {
-    for(typename QSet<std::shared_ptr<T>>::iterator it = mObjs.begin(); it != mObjs.end(); it++)
+    for(typename QSet<T>::iterator it = mObjs.begin(); it != mObjs.end(); it++)
     {
         if((*it)->getZone().intersects(pZone))
         {
@@ -138,9 +138,9 @@ void QuadtreeNode<T>::search(const QRect &pZone, QSet<std::shared_ptr<T>> &found
 }
 
 template <typename T>
-void QuadtreeNode<T>::getAllObjsOfSubtree(QSet<std::shared_ptr<T>> &pResList)
+void QuadtreeNode<T>::getAllObjsOfSubtree(QSet<T>& pResList)
 {
-    for(typename QSet<std::shared_ptr<T>>::iterator it = mObjs.begin(); it != mObjs.end(); it++)
+    for(typename QSet<T>::iterator it = mObjs.begin(); it != mObjs.end(); it++)
     {
         pResList.insert(*it);
     }

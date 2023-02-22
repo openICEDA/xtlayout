@@ -35,5 +35,6 @@ private:
     Ui::MainWindow *ui;
     PaintingArea *mPA;
     SelectionTool mSelectionTool;
+    QMenu *file_menu;
 };
 #endif // MAINWINDOW_H

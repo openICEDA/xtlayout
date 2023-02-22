@@ -5,7 +5,7 @@ class QPainter;
 class VisualEntity
 {
 public:
-    virtual void draw(QPainter* painter) = 0;
+    virtual void draw(QPainter* pPainter) = 0;
     VisualEntity();
 };
 

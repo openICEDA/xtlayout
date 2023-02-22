@@ -4,8 +4,11 @@
 #include "tool.h"
 #include <QPoint>
 #include <QObject>
+#include "lerectangle.h"
 #include "globalsetting.h"
-class Rectangle;
+#include "xtdb.h"
+
+
 class QMouseEvent;
 class PaintingArea;
 class RectangleTool : public Tool
@@ -23,8 +26,8 @@ signals:
 private:
     GlobalSetting::layer_type mLayer;
     bool mFirstPointFixed;
-    std::shared_ptr<Rectangle> mRectangle;
     PaintingArea *mPA;
+    LERectangle* mRectangle;
 };
 
 #endif // RECTANGLETOOL_H

@@ -5,9 +5,8 @@
 
 SelectionTool::SelectionTool(PaintingArea *pPA):mIsPressed(false), mPA(pPA), Tool(SELECTION_TOOL)
 {
-    std::shared_ptr<SelectionBox> tmpSharedPtr(new SelectionBox());
-    mSelectionBox = tmpSharedPtr.get(); //do not use this raw pointer to initialize another shared_ptr by shared_ptr::reset().
-    pPA->insertVisualEntity(std::move(tmpSharedPtr));
+    mSelectionBox = new SelectionBox(); //do not use this raw pointer to initialize another shared_ptr by shared_ptr::reset().
+    pPA->insertVisualEntity(mSelectionBox);
 }
 
 void SelectionTool::mousePressEvent(QMouseEvent *event)
@@ -16,17 +15,16 @@ void SelectionTool::mousePressEvent(QMouseEvent *event)
     mFirstPoint = event->pos();
 }
 
-void SelectionTool::mouseMoveEvent(QMouseEvent *event)
+void SelectionTool::mouseMoveEvent(QMouseEvent* event)
 {
     if (mIsPressed)
     {
         mPA->getQuadTree().search(mSelectionBox->getZone(), mSelectedObjs);
-        for(typename QSet<std::shared_ptr<Rectangle>>::iterator it = mSelectedObjs.begin(); it != mSelectedObjs.end(); it++)
+        for(typename QSet<LERectangle*>::iterator it = mSelectedObjs.begin(); it != mSelectedObjs.end(); it++)
         {
             (*it)->setSelected(true);
         }
-        QSet<std::shared_ptr<VisualEntity>> &allVisualEntities = mPA->getAllVisualEntities();
-
+        QSet<VisualEntity*>& allVisualEntities = mPA->getAllVisualEntities();
 
         mSelectionBox->setFirstPoint(mFirstPoint);
         mSelectionBox->setSecondPoint(event->pos());

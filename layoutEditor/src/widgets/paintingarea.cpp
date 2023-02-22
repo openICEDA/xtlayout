@@ -6,14 +6,14 @@
 #include "tool.h"
 #include "visualentity.h"
 #include "grid.h"
-#include "rectangle.h"
 #include "quadtreenode.h"
 #include "globalsetting.h"
 
 PaintingArea::PaintingArea(QWidget *parent)
     : QWidget{parent}, mQuadtree(QRect(QPoint(0, 0), GlobalSetting::canvasSize))
 {
-    insertVisualEntity(std::shared_ptr<VisualEntity>(new Grid));
+    mBlock = xtdb::XtBlock::create();
+    insertVisualEntity(new Grid);
     //load gds2 file into quadtree, the coordinates in gds2 is in global coordinate system.
     //there should exist another data structure to store the shapes inside view ports. After loading
     // all shapes into quadtree, i search for the shapes inside view ports and store the result in this
@@ -21,12 +21,12 @@ PaintingArea::PaintingArea(QWidget *parent)
     update();
 }
 
-void PaintingArea::paintEvent(QPaintEvent *)
+void PaintingArea::paintEvent(QPaintEvent*)
 {
     //TODO: Seperate the drawer
     QPainter painter(this);
 
-    QSet<std::shared_ptr<VisualEntity>>::const_iterator visualEntityIter = mAllVisualEntities.constBegin();
+    QSet<VisualEntity*>::const_iterator visualEntityIter = mAllVisualEntities.constBegin();
     while (visualEntityIter != mAllVisualEntities.constEnd()) {
         (*visualEntityIter)->draw(&painter);
         ++visualEntityIter;
@@ -57,14 +57,14 @@ void PaintingArea::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
-void PaintingArea::insertVisualEntity(std::shared_ptr<VisualEntity> pVisualEntity)
+void PaintingArea::insertVisualEntity(VisualEntity* pVisualEntity)
 {
-    mAllVisualEntities.insert(std::move(pVisualEntity));
+    mAllVisualEntities.insert(pVisualEntity);
 }
 
-void PaintingArea::deleteVisualEntity(VisualEntity *pVisualEntity)
+void PaintingArea::deleteVisualEntity(VisualEntity* pVisualEntity)
 {
-    mAllVisualEntities.erase(mAllVisualEntities.find(std::shared_ptr<VisualEntity>(pVisualEntity)));
+//    mAllVisualEntities.erase(mAllVisualEntities.find(std::shared_ptr<VisualEntity>(pVisualEntity)));
 //    mQuadtree.erase(mAllVisualEntities.find(pVisualEntity));
 }
 

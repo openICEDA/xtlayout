@@ -10,6 +10,8 @@
 #include "drawcommand.h"
 #include "rectangletool.h"
 #include "selectiontool.h"
+#include "xtdb.h"
+using namespace xtdb;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , mUiState(NO_ACTIVE_TOOL_STATE), ui(new Ui::MainWindow), mPA(new PaintingArea(this)), mSelectionTool(mPA)
@@ -27,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(selectToolButton, SIGNAL(clicked()), this, SLOT(newRectangleTool()));
     mPA->setTool(&mSelectionTool);
     qApp->installEventFilter(this);
+
+    XtBlock* xtblock = XtBlock::create();
 }
 
 void MainWindow::paintEvent(QPaintEvent *)

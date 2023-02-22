@@ -3,8 +3,8 @@
 #include "tool.h"
 #include "paintingarea.h"
 #include <memory>
-#include "rectangle.h"
 #include "selectionbox.h"
+#include "LERectangle.h"
 
 class SelectionTool: public Tool
 {
@@ -19,7 +19,7 @@ public:
 private:
     bool mIsPressed;
     QPoint mFirstPoint;
-    QSet<std::shared_ptr<Rectangle>> mSelectedObjs;
+    QSet<LERectangle*> mSelectedObjs;
     PaintingArea *mPA;
     SelectionBox *mSelectionBox;
 };
