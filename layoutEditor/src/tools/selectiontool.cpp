@@ -46,14 +46,28 @@ void SelectionTool::resetSelectionBox()
     mIsPressed = false;
 }
 
-void SelectionTool::keyPressEvent(QKeyEvent *event)
+void SelectionTool::keyPressEvent(QKeyEvent* event)
 {
-//    switch(event->key())
-//    {
-//        case Qt::Key_Escape:
+    switch(event->key())
+    {
+        case Qt::Key_Delete:
+//            mPA->getAllVisualEntities().subtract((QSet<VisualEntity*>&)(mSelectedObjs));
 //            mPA->deleteVisualEntity(mRectangle);
-//            break;
-//        default:
-//            break;
-//    }
+            for (QSet<LERectangle*>::Iterator it_sel = mSelectedObjs.begin(); it_sel != mSelectedObjs.end(); it_sel++)
+            {
+                QSet<VisualEntity*>& av = mPA->getAllVisualEntities();
+                QSet<VisualEntity*>::Iterator it_av = av.find(*it_sel);
+                if (it_av != av.end())
+                {
+                    av.erase(it_av);
+                }
+
+                (*it_sel)->destroy();
+            }
+            mSelectedObjs.clear();
+            mPA->update();
+            break;
+        default:
+            break;
+    }
 }

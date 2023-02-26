@@ -4,7 +4,7 @@
 #include "paintingarea.h"
 #include <memory>
 #include "selectionbox.h"
-#include "LERectangle.h"
+#include "lerectangle.h"
 
 class SelectionTool: public Tool
 {

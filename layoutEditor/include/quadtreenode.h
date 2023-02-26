@@ -10,20 +10,24 @@ template <typename T>
 class QuadtreeNode
 {
 public:
-    QuadtreeNode(const QRect& pZone, int pLevel = 0);
-    ~QuadtreeNode(){};
-    bool contains(const QRect& pZone) const;
-    bool intersects(const QRect& pZone) const;
-    void insert(const T& pObj);
-    void search(const QRect& pZone, QSet<T>& foundObjs); //TODO:is QSet<T&> better?
-    void getAllObjsOfSubtree(QSet<T>& pResList);
-    void resize(const QRect& pZone);
     QRect mZone;
     QSet<T> mObjs;
     int mLevel;
     static const int maxLevel;
     std::unique_ptr<QuadtreeNode<T>> mChildren[4];
     QRect mChildrenZones[4];
+public:
+    QuadtreeNode(const QRect& pZone, int pLevel = 0);
+    ~QuadtreeNode(){};
+    bool contains(const QRect& pZone) const;
+    bool intersects(const QRect& pZone) const;
+    void insert(const T& pObj);
+    void search(const QRect& pZone, QSet<T>& pFoundObjs); //TODO:is QSet<T&> better?
+    void getAllObjsOfSubtree(QSet<T>& pResList);
+    void deleteAllObjsOfSubtree();
+    void deleteObj(const T& pObj);
+    void resize(const QRect& pZone);
+    void deleteObjsIn(const QRect& pZone);
 };
 
 template <typename T>
@@ -47,6 +51,41 @@ void QuadtreeNode<T>::resize(const QRect& pZone)
 
 }
 
+template <typename T>
+void QuadtreeNode<T>::deleteObjsIn(const QRect& pZone)
+{
+    for (typename QSet<T>::iterator it = mObjs.begin(); it != mObjs.end(); it++)
+    {
+        if((*it)->getZone().intersects(pZone))
+        {
+            mObjs.erase(it);
+        }
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        if (nullptr != mChildren[i])
+        {
+            if (pZone.contains(mChildrenZones[i]))
+            {
+                mChildren[i]->deleteAllObjsOfSubtree();
+            }
+            else if (pZone.intersects(mChildrenZones[i]))
+            {
+                mChildren[i]->deleteObjsIn(pZone);
+            }
+        }
+    }
+}
+
+template <typename T>
+void QuadtreeNode<T>::deleteObj(const T& pObj)
+{
+    typename QSet<T>::const_iterator it = mObjs.find(pObj);
+    if (mObjs.end() != it)
+    {
+        mObjs.erase(it);
+    }
+}
 //template <typename T>
 //QuadtreeNode<T>::~QuadtreeNode()
 //{
@@ -88,7 +127,8 @@ void QuadtreeNode<T>::insert(const T& pObj)
     }
     if(mLevel == maxLevel)
     {
-        mObjs.insert(std::move(pObj));
+        mObjs.insert(pObj);
+        pObj->setOwnerNode(this);
         return;
     }
     for(int i = 0; i < 4; i++)
@@ -103,35 +143,32 @@ void QuadtreeNode<T>::insert(const T& pObj)
             return;
         }
     }
-    mObjs.insert(std::move(pObj));
+    mObjs.insert(pObj);
+    pObj->setOwnerNode(this);
     return;
 }
 
 template <typename T>
-void QuadtreeNode<T>::search(const QRect& pZone, QSet<T>& foundObjs)
+void QuadtreeNode<T>::search(const QRect& pZone, QSet<T>& pFoundObjs)
 {
     for(typename QSet<T>::iterator it = mObjs.begin(); it != mObjs.end(); it++)
     {
         if((*it)->getZone().intersects(pZone))
         {
-            foundObjs.insert(*it);
+            pFoundObjs.insert(*it);
         }
     }
-//    if(mLevel == maxLevel)
-//    {
-//        return;
-//    }
     for(int i = 0; i < 4; i++)
     {
         if (nullptr != mChildren[i])
         {
             if(pZone.contains(mChildrenZones[i]))
             {
-                mChildren[i]->getAllObjsOfSubtree(foundObjs);
+                mChildren[i]->getAllObjsOfSubtree(pFoundObjs);
             }
             else if(pZone.intersects(mChildrenZones[i]))
             {
-                mChildren[i]->search(pZone, foundObjs);
+                mChildren[i]->search(pZone, pFoundObjs);
             }
         }
     }
@@ -153,4 +190,16 @@ void QuadtreeNode<T>::getAllObjsOfSubtree(QSet<T>& pResList)
     }
 }
 
+template <typename T>
+void QuadtreeNode<T>::deleteAllObjsOfSubtree()
+{
+    mObjs.clear();
+    for(int i = 0; i < 4; i++)
+    {
+        if(nullptr != mChildren[i])
+        {
+            mChildren[i]->deleteAllObjsOfSubtree();
+        }
+    }
+}
 #endif // QUADTREENODE_H

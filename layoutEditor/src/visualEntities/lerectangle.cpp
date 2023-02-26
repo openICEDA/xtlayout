@@ -1,12 +1,12 @@
 #include "lerectangle.h"
 #include <QPainter>
 
-LERectangle::LERectangle():mRect(nullptr), mSelected(false)
+LERectangle::LERectangle():mRect(nullptr), mSelected(false), mOwnerNode(nullptr)
 {
 
 }
 
-LERectangle::LERectangle(xtdb::XtRectangle* pRect):mRect(pRect), mSelected(false)
+LERectangle::LERectangle(xtdb::XtRectangle* pRect):mRect(pRect), mSelected(false), mOwnerNode(nullptr)
 {
 }
 
@@ -47,4 +47,20 @@ void LERectangle::draw(QPainter* pPainter)
         pPainter->setBrush(QBrush(QColor(255, 0, 0), Qt::SolidPattern));
     }
     pPainter->drawRect(getZone());
+}
+
+void LERectangle::destroy()
+{
+    getOwnerNode()->deleteObj(this);
+    mRect->destroy();
+}
+
+QuadtreeNode<LERectangle*>* LERectangle::getOwnerNode()
+{
+    return mOwnerNode;
+}
+
+void LERectangle::setOwnerNode(QuadtreeNode<LERectangle*>* pOwnerNode)
+{
+    mOwnerNode = pOwnerNode;
 }

@@ -12,7 +12,7 @@
 #include "selectiontool.h"
 #include "xtdb.h"
 using namespace xtdb;
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , mUiState(NO_ACTIVE_TOOL_STATE), ui(new Ui::MainWindow), mPA(new PaintingArea(this)), mSelectionTool(mPA)
 {
@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     XtBlock* xtblock = XtBlock::create();
 }
 
-void MainWindow::paintEvent(QPaintEvent *)
+void MainWindow::paintEvent(QPaintEvent*)
 {
 }
 
@@ -44,7 +44,7 @@ void MainWindow::newRectangleTool()
         mSelectionTool.resetSelectionBox();
         mPA->update();
     }
-    RectangleTool *rectangleTool = new RectangleTool(mPA);
+    RectangleTool* rectangleTool = new RectangleTool(mPA);
     mPA->setTool(rectangleTool);
     connect(rectangleTool, SIGNAL(completed()), this, SLOT(switchBackToSelectionTool()));
 }
@@ -60,14 +60,16 @@ void MainWindow::newSelectionTool()
     mPA->setTool(&mSelectionTool);
 }
 
-bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 {
     return false;
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *event)
+void MainWindow::keyPressEvent(QKeyEvent* event)
 {
+    mPA->getTool()->keyPressEvent(event);
 }
+
 MainWindow::~MainWindow()
 {
     delete ui;

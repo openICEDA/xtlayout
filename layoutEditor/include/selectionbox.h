@@ -6,6 +6,8 @@
 
 class SelectionBox : public VisualEntity
 {
+private:
+    QRect mRect;
 public:
     SelectionBox();
     QRect getZone(){return mRect;};
@@ -13,9 +15,6 @@ public:
     void setSecondPoint(const QPoint &pPoint){mRect.setBottomRight(pPoint);};
     void reset(){mRect = QRect(0,0,0,0);};
     void draw(QPainter* pPainter) override;
-
-private:
-    QRect mRect;
 };
 
 #endif // SELECTIONBOX_H

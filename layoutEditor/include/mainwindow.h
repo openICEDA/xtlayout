@@ -16,11 +16,11 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    void paintEvent(QPaintEvent *) override;
-    void keyPressEvent(QKeyEvent *) override;
-    bool eventFilter(QObject *obj, QEvent *event) override;
+    void paintEvent(QPaintEvent*) override;
+    void keyPressEvent(QKeyEvent*) override;
+    bool eventFilter(QObject* obj, QEvent* event) override;
     void newSelectionTool();
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 public slots:
     void newRectangleTool();
@@ -32,9 +32,9 @@ private:
         TOOL_ACTIVE_STATE
     };
     ui_state mUiState;
-    Ui::MainWindow *ui;
-    PaintingArea *mPA;
+    Ui::MainWindow* ui;
+    PaintingArea* mPA;
     SelectionTool mSelectionTool;
-    QMenu *file_menu;
+    QMenu* file_menu;
 };
 #endif // MAINWINDOW_H

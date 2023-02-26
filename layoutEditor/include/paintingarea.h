@@ -15,13 +15,13 @@ class PaintingArea : public QWidget
     Q_OBJECT
 public:
     xtdb::XtBlock* mBlock; //TODO: fileio
-    explicit PaintingArea(QWidget *parent = nullptr);
-    void paintEvent(QPaintEvent *) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
+    explicit PaintingArea(QWidget* parent = nullptr);
+    void paintEvent(QPaintEvent*) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
     void insertVisualEntity(VisualEntity* pVisualEntity);
-    void deleteVisualEntity(VisualEntity *pVisualEntity);
+    void deleteVisualEntity(VisualEntity* pVisualEntity);
     QSet<VisualEntity*>& getAllVisualEntities(){return mAllVisualEntities;};
     void setTool(Tool *pTool){mTool = pTool;};
     Tool* getTool(){return mTool;};

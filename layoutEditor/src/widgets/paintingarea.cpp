@@ -23,7 +23,7 @@ PaintingArea::PaintingArea(QWidget *parent)
 
 void PaintingArea::paintEvent(QPaintEvent*)
 {
-    //TODO: Seperate the drawer
+    //TODO: Seperate the drawer or let QPainter be member variable.
     QPainter painter(this);
 
     QSet<VisualEntity*>::const_iterator visualEntityIter = mAllVisualEntities.constBegin();
@@ -64,8 +64,11 @@ void PaintingArea::insertVisualEntity(VisualEntity* pVisualEntity)
 
 void PaintingArea::deleteVisualEntity(VisualEntity* pVisualEntity)
 {
-//    mAllVisualEntities.erase(mAllVisualEntities.find(std::shared_ptr<VisualEntity>(pVisualEntity)));
-//    mQuadtree.erase(mAllVisualEntities.find(pVisualEntity));
+    QSet<VisualEntity*>::Iterator it = mAllVisualEntities.find(pVisualEntity);
+    if (mAllVisualEntities.end() != it)
+    {
+        mAllVisualEntities.erase(it);
+    }
 }
 
 void PaintingArea::deleteTool()
