@@ -4,7 +4,7 @@
 #include "tool.h"
 #include <QPoint>
 #include <QObject>
-#include "lerectangle.h"
+#include "lrectangle.h"
 #include "globalsetting.h"
 #include "xtdb.h"
 
@@ -16,18 +16,19 @@ class RectangleTool : public Tool
 public:
     Q_OBJECT
 public:
-    RectangleTool(PaintingArea *pPA);
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
+    RectangleTool(PaintingArea* pPA);
+    ~RectangleTool() override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
 signals:
     void completed();
 private:
     GlobalSetting::layer_type mLayer;
     bool mFirstPointFixed;
-    PaintingArea *mPA;
-    LERectangle* mRectangle;
+    PaintingArea* mPA;
+    LRectangle* mRectangle;
 };
 
 #endif // RECTANGLETOOL_H

@@ -8,12 +8,16 @@
 #include "paintingarea.h"
 #include "quadtreenode.h"
 #include "xtdb.h"
-#include "lerectangle.h"
-
+#include "lrectangle.h"
+#include <iostream>
 using namespace xtdb;
 RectangleTool::RectangleTool(PaintingArea* pPA):mFirstPointFixed(false), mPA(pPA), Tool(RECTANGLE_TOOL), mRectangle(nullptr)
 {
 
+}
+
+RectangleTool::~RectangleTool()
+{
 }
 
 void RectangleTool::mousePressEvent(QMouseEvent* event)
@@ -22,15 +26,15 @@ void RectangleTool::mousePressEvent(QMouseEvent* event)
     {
         mPA->setMouseTracking(true);
         mFirstPointFixed = true;
-        mRectangle = new LERectangle(XtRectangle::create(mPA->mBlock));
+        mRectangle = new LRectangle();
         mRectangle->setFirstPoint(event->pos());
         mPA->insertVisualEntity(mRectangle);
-        mPA->getQuadTree().insert(mRectangle);
     }
     else
     {
+        mPA->getQuadTree().insert(mRectangle);
+        mRectangle->storeToDB(mPA->mBlock);
         mPA->setMouseTracking(false);
-        mRectangle = nullptr;
         emit completed();
     }
 }
@@ -56,7 +60,7 @@ void RectangleTool::keyPressEvent(QKeyEvent* event)
     {
         case Qt::Key_Escape:
             //delete mRectangle, since it is not stored into database yet, no need to destroy
-            mPA->deleteVisualEntity(mRectangle);
+            mPA->removeVisualEntity(mRectangle);
             mPA->update();
             break;
         default:

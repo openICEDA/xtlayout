@@ -8,6 +8,7 @@
 #include "grid.h"
 #include "quadtreenode.h"
 #include "globalsetting.h"
+#include <algorithm>
 
 PaintingArea::PaintingArea(QWidget *parent)
     : QWidget{parent}, mQuadtree(QRect(QPoint(0, 0), GlobalSetting::canvasSize))
@@ -33,27 +34,36 @@ void PaintingArea::paintEvent(QPaintEvent*)
     }
 }
 
-void PaintingArea::mousePressEvent(QMouseEvent *event)
+void PaintingArea::mousePressEvent(QMouseEvent* event)
 {
-    if(nullptr != mTool)
+    for (std::vector<Tool*>::const_iterator it = mActiveTools.cbegin(); it != mActiveTools.cend(); it++)
     {
-        mTool->mousePressEvent(event);
+        Tool* tool = *it;
+        if (tool) {
+            tool->mousePressEvent(event);
+        }
     }
 }
 
-void PaintingArea::mouseMoveEvent(QMouseEvent *event)
+void PaintingArea::mouseMoveEvent(QMouseEvent* event)
 {
-    if(nullptr != mTool)
+    for (std::vector<Tool*>::const_iterator it = mActiveTools.cbegin(); it != mActiveTools.cend(); it++)
     {
-        mTool->mouseMoveEvent(event);
+        Tool* tool = *it;
+        if (tool) {
+            tool->mouseMoveEvent(event);
+        }
     }
 }
 
-void PaintingArea::mouseReleaseEvent(QMouseEvent *event)
+void PaintingArea::mouseReleaseEvent(QMouseEvent* event)
 {
-    if(nullptr != mTool)
+    for (std::vector<Tool*>::const_iterator it = mActiveTools.cbegin(); it != mActiveTools.cend(); it++)
     {
-        mTool->mouseReleaseEvent(event);
+        Tool* tool = *it;
+        if (tool) {
+            tool->mouseReleaseEvent(event);
+        }
     }
 }
 
@@ -62,17 +72,19 @@ void PaintingArea::insertVisualEntity(VisualEntity* pVisualEntity)
     mAllVisualEntities.insert(pVisualEntity);
 }
 
-void PaintingArea::deleteVisualEntity(VisualEntity* pVisualEntity)
+void PaintingArea::removeVisualEntity(VisualEntity* pVisualEntity)
 {
-    QSet<VisualEntity*>::Iterator it = mAllVisualEntities.find(pVisualEntity);
-    if (mAllVisualEntities.end() != it)
+    QSet<VisualEntity*>::const_iterator it = mAllVisualEntities.find(pVisualEntity);
+    if (mAllVisualEntities.cend() != it)
     {
         mAllVisualEntities.erase(it);
     }
 }
 
-void PaintingArea::deleteTool()
+void PaintingArea::deactivateTool(Tool::tool_type pToolType)
 {
-    delete mTool;
-    mTool = nullptr;
+    //TODO: deal with case with tools of same type
+    std::vector<Tool*>::iterator it = std::find_if(mActiveTools.begin(), mActiveTools.end(), [&](const auto& tool){return pToolType == tool->getToolType();});
+    delete (*it);
+    mActiveTools.erase(it);
 }

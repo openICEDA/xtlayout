@@ -13,8 +13,7 @@
 #include "xtdb.h"
 using namespace xtdb;
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent)
-    , mUiState(NO_ACTIVE_TOOL_STATE), ui(new Ui::MainWindow), mPA(new PaintingArea(this)), mSelectionTool(mPA)
+    : QMainWindow(parent), ui(new Ui::MainWindow), mPA(new PaintingArea(this))
 {
     ui->setupUi(this);
     setCentralWidget(mPA);
@@ -27,10 +26,8 @@ MainWindow::MainWindow(QWidget* parent)
     selectToolButton->setText("Select");
     connect(rectToolButton, SIGNAL(clicked()), this, SLOT(newRectangleTool()));
     connect(selectToolButton, SIGNAL(clicked()), this, SLOT(newRectangleTool()));
-    mPA->setTool(&mSelectionTool);
+    mPA->activateTool(new SelectionTool(mPA));
     qApp->installEventFilter(this);
-
-    XtBlock* xtblock = XtBlock::create();
 }
 
 void MainWindow::paintEvent(QPaintEvent*)
@@ -39,25 +36,21 @@ void MainWindow::paintEvent(QPaintEvent*)
 
 void MainWindow::newRectangleTool()
 {
-    if (mPA->getTool()->getToolType() == Tool::SELECTION_TOOL)
-    {
-        mSelectionTool.resetSelectionBox();
-        mPA->update();
-    }
     RectangleTool* rectangleTool = new RectangleTool(mPA);
-    mPA->setTool(rectangleTool);
+    mPA->activateTool(rectangleTool);
+    mPA->deactivateTool(Tool::SELECTION_TOOL);
     connect(rectangleTool, SIGNAL(completed()), this, SLOT(switchBackToSelectionTool()));
 }
 
 void MainWindow::switchBackToSelectionTool()
 {
-    mPA->deleteTool();
-    mPA->setTool(&mSelectionTool);
+    mPA->deactivateTool(Tool::RECTANGLE_TOOL);
+    mPA->activateTool(new SelectionTool(mPA));
 }
 
 void MainWindow::newSelectionTool()
 {
-    mPA->setTool(&mSelectionTool);
+    mPA->activateTool(new SelectionTool(mPA));
 }
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event)
@@ -67,7 +60,14 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
-    mPA->getTool()->keyPressEvent(event);
+    std::vector<Tool*>& activeTools = mPA->getActiveTools();
+    for (std::vector<Tool*>::const_iterator it = activeTools.cbegin(); it != activeTools.cend(); it++)
+    {
+        Tool* tool = *it;
+        if (tool) {
+            tool->keyPressEvent(event);
+        }
+    }
 }
 
 MainWindow::~MainWindow()

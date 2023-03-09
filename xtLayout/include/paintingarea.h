@@ -4,11 +4,12 @@
 #include <QWidget>
 #include <QSet>
 #include <QPoint>
+#include <vector>
 #include "quadtreenode.h"
 #include "xtdb.h"
-#include "lerectangle.h"
+#include "lrectangle.h"
+#include "tool.h"
 
-class Tool;
 class VisualEntity;
 class PaintingArea : public QWidget
 {
@@ -21,16 +22,16 @@ public:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void insertVisualEntity(VisualEntity* pVisualEntity);
-    void deleteVisualEntity(VisualEntity* pVisualEntity);
+    void removeVisualEntity(VisualEntity* pVisualEntity);
     QSet<VisualEntity*>& getAllVisualEntities(){return mAllVisualEntities;};
-    void setTool(Tool *pTool){mTool = pTool;};
-    Tool* getTool(){return mTool;};
-    void deleteTool();
-    QuadtreeNode<LERectangle*>& getQuadTree(){return mQuadtree;};
+    void activateTool(Tool* pTool){mActiveTools.push_back(pTool);};
+    void deactivateTool(Tool::tool_type pTool);
+    std::vector<Tool*>& getActiveTools(){return mActiveTools;};
+    QuadtreeNode<LRectangle*>& getQuadTree(){return mQuadtree;};
 private:
-    Tool* mTool;
+    std::vector<Tool*> mActiveTools;
     QSet<VisualEntity*> mAllVisualEntities; //TODO:Try to involve array or vector to take advantage of cache during iteration
     QSet<VisualEntity*> mSelectedEntities;
-    QuadtreeNode<LERectangle*> mQuadtree;
+    QuadtreeNode<LRectangle*> mQuadtree;
 };
 #endif // PAINTINGAREA_H

@@ -6,9 +6,12 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-#include"commandcontrol.h"
-#include<QSet>
-#include"selectiontool.h"
+#include "commandcontrol.h"
+#include <QSet>
+#include "selectiontool.h"
+#include "tool.h"
+#include <vector>
+
 class PaintingArea;
 class Shape;
 
@@ -26,15 +29,8 @@ public slots:
     void newRectangleTool();
     void switchBackToSelectionTool();
 private:
-    enum ui_state{
-        NO_ACTIVE_TOOL_STATE,
-        INTERMEDIATE_STATE,
-        TOOL_ACTIVE_STATE
-    };
-    ui_state mUiState;
     Ui::MainWindow* ui;
     PaintingArea* mPA;
-    SelectionTool mSelectionTool;
     QMenu* file_menu;
 };
 #endif // MAINWINDOW_H
