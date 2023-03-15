@@ -14,11 +14,7 @@ PaintingArea::PaintingArea(QWidget *parent)
     : QWidget{parent}, mQuadtree(QRect(QPoint(0, 0), GlobalSetting::canvasSize))
 {
     mBlock = xtdb::XtBlock::create();
-    insertVisualEntity(new Grid);
-    //load gds2 file into quadtree, the coordinates in gds2 is in global coordinate system.
-    //there should exist another data structure to store the shapes inside view ports. After loading
-    // all shapes into quadtree, i search for the shapes inside view ports and store the result in this
-    // new data structre
+//    insertVisualEntity(new Grid);
     update();
 }
 
@@ -26,12 +22,7 @@ void PaintingArea::paintEvent(QPaintEvent*)
 {
     //TODO: Seperate the drawer or let QPainter be member variable.
     QPainter painter(this);
-
-    QSet<VisualEntity*>::const_iterator visualEntityIter = mAllVisualEntities.constBegin();
-    while (visualEntityIter != mAllVisualEntities.constEnd()) {
-        (*visualEntityIter)->draw(&painter);
-        ++visualEntityIter;
-    }
+    std::for_each(mAllVisualEntities.cbegin(), mAllVisualEntities.cend(), [&](VisualEntity* ve){ve->draw(&painter);});
 }
 
 void PaintingArea::mousePressEvent(QMouseEvent* event)
@@ -85,6 +76,35 @@ void PaintingArea::deactivateTool(Tool::tool_type pToolType)
 {
     //TODO: deal with case with tools of same type
     std::vector<Tool*>::iterator it = std::find_if(mActiveTools.begin(), mActiveTools.end(), [&](const auto& tool){return pToolType == tool->getToolType();});
-    delete (*it);
-    mActiveTools.erase(it);
+    if (mActiveTools.cend() != it)
+    {
+        delete (*it);
+        mActiveTools.erase(it);
+    }
+}
+
+void PaintingArea::activateTool(Tool* pTool)
+{
+    if (!findActiveTool(pTool->getToolType()))
+    {
+        mActiveTools.push_back(pTool);
+    }
+}
+
+Tool* PaintingArea::findActiveTool(Tool::tool_type pToolType)
+{
+    std::vector<Tool*>::iterator it = std::find_if(mActiveTools.begin(), mActiveTools.end(), [&](const auto& tool){return pToolType == tool->getToolType();});
+    if (mActiveTools.cend() != it)
+    {
+        return *it;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void PaintingArea::searchRects(const QRect& pZone, QSet<LRectangle*>& pFoundObjs)
+{
+    mQuadtree.search(pZone, pFoundObjs);
 }

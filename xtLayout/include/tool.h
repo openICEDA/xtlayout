@@ -21,7 +21,7 @@ public:
     virtual void mouseMoveEvent(QMouseEvent* event) = 0;
     virtual void mouseReleaseEvent(QMouseEvent* event) = 0;
     virtual void keyPressEvent(QKeyEvent* event) = 0;
-    virtual tool_type getToolType(){return mToolType;};
+    tool_type getToolType(){return mToolType;};
 protected:
     tool_type mToolType;
 };

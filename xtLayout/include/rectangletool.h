@@ -11,12 +11,18 @@
 
 class QMouseEvent;
 class PaintingArea;
+class NavigationTool;
 class RectangleTool : public Tool
 {
-public:
     Q_OBJECT
+private:
+    GlobalSetting::layer_type mLayer;
+    bool mFirstPointFixed;
+    PaintingArea* mPA;
+    LRectangle* mRectangle;
+    NavigationTool* mNavTool;
 public:
-    RectangleTool(PaintingArea* pPA);
+    RectangleTool(PaintingArea* pPA, NavigationTool* pNavTool);
     ~RectangleTool() override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
@@ -24,11 +30,6 @@ public:
     void keyPressEvent(QKeyEvent* event) override;
 signals:
     void completed();
-private:
-    GlobalSetting::layer_type mLayer;
-    bool mFirstPointFixed;
-    PaintingArea* mPA;
-    LRectangle* mRectangle;
 };
 
 #endif // RECTANGLETOOL_H

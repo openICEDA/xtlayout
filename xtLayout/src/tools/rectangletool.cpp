@@ -1,4 +1,5 @@
 #include "rectangletool.h"
+#include "navigationtool.h"
 #include <QEvent>
 #include <QDebug>
 #include <QPainter>
@@ -11,7 +12,7 @@
 #include "lrectangle.h"
 #include <iostream>
 using namespace xtdb;
-RectangleTool::RectangleTool(PaintingArea* pPA):mFirstPointFixed(false), mPA(pPA), Tool(RECTANGLE_TOOL), mRectangle(nullptr)
+RectangleTool::RectangleTool(PaintingArea* pPA, NavigationTool* pNavTool):mFirstPointFixed(false), mPA(pPA), Tool(RECTANGLE_TOOL), mRectangle(nullptr), mNavTool(pNavTool)
 {
 
 }
@@ -26,13 +27,15 @@ void RectangleTool::mousePressEvent(QMouseEvent* event)
     {
         mPA->setMouseTracking(true);
         mFirstPointFixed = true;
-        mRectangle = new LRectangle();
-        mRectangle->setFirstPoint(event->pos());
+        mRectangle = new LRectangle(mNavTool);
+        mRectangle->setFirstPoint(mNavTool->viewportCS2WorldCS(event->pos()));
+        mRectangle->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
         mPA->insertVisualEntity(mRectangle);
     }
     else
     {
-        mPA->getQuadTree().insert(mRectangle);
+        mRectangle->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
+        mPA->getQuadTree().insert(mRectangle); //TODO: how to avoid getQuadtree?
         mRectangle->storeToDB(mPA->mBlock);
         mPA->setMouseTracking(false);
         emit completed();
@@ -43,7 +46,7 @@ void RectangleTool::mouseMoveEvent(QMouseEvent* event)
 {
     if(nullptr != mRectangle)
     {
-        mRectangle->setSecondPoint(event->pos());
+        mRectangle->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
         mPA->update();
     }
 }
@@ -61,6 +64,7 @@ void RectangleTool::keyPressEvent(QKeyEvent* event)
         case Qt::Key_Escape:
             //delete mRectangle, since it is not stored into database yet, no need to destroy
             mPA->removeVisualEntity(mRectangle);
+            delete mRectangle;
             mPA->update();
             break;
         default:

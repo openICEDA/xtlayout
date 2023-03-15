@@ -3,15 +3,32 @@
 
 #include <vector>
 #include <QDebug>
-using namespace std;
 class Matrix
 {
-public:
+private:
+    friend class AccessDummy;
     std::vector<double> mEntries;
     size_t mRowNum;
     size_t mColNum;
+public:
+    static Matrix translateMat(const std::vector<double>& pVec)
+    {
+        return Matrix::mat3(1, 0, pVec[0],
+                            0, 1, pVec[1],
+                            0, 0, 1);
+    }
+    static std::vector<Matrix> transformPnts(const Matrix& pMat, const std::vector<Matrix>& pOrigPnts)
+    {
+        std::vector<Matrix> res;
+        res.reserve(pMat.mEntries.capacity());
+        for (std::vector<Matrix>::const_iterator it; it != pOrigPnts.cend(); it++)
+        {
+            res.push_back(pMat * (*it));
+        }
+        return res;
+    }
     template <typename T>
-    Matrix(size_t pRowNum, size_t pColNum, T &&pVec);
+    Matrix(size_t pRowNum, size_t pColNum, T&& pVec);
     template <typename ... T>
     static Matrix mat3(const T& ... pEntry);
     template <typename ... T>
@@ -20,7 +37,9 @@ public:
     static Matrix vec3(const T& ... pEntry);
     template <typename ... T>
     static Matrix vec2(const T& ... pEntry);
-    Matrix operator*(const Matrix &pRhs)
+    template <typename ... T>
+    static std::vector<Matrix> transformPnts(const Matrix& pMat, const std::vector<Matrix>& pOrigPnts);
+    Matrix operator*(const Matrix& pRhs) const
     {
         std::vector<double> temp;
         for(size_t lhsRow = 0; lhsRow < mRowNum; lhsRow++)
@@ -35,7 +54,7 @@ public:
         }
         return Matrix(mRowNum, pRhs.mColNum, temp);
     }
-    Matrix operator+(const Matrix &pRhs)
+    Matrix operator+(const Matrix& pRhs)
     {
         std::vector<double> temp;
         for(size_t lhsRow = 0; lhsRow < mRowNum; lhsRow++)
@@ -45,14 +64,32 @@ public:
         }
         return Matrix(mRowNum, mColNum, temp);
     }
+    class AccessDummy
+    {
+    private:
+        size_t mRow;
+        Matrix* mMat;
+    public:
+        AccessDummy(size_t pRow, Matrix* pMat):mRow(pRow), mMat(pMat)
+        {
+        }
+        double operator[](size_t pCol)
+        {
+            return mMat->mEntries[convert2dTo1d(mMat->mColNum, mRow, pCol)];
+        }
+    };
+    AccessDummy operator[](size_t pRow)
+    {
+        return AccessDummy(pRow, this);
+    }
     static constexpr inline int convert2dTo1d(size_t pColNum, size_t pRow, size_t pCol)
     {
         return pRow * pColNum + pCol;
     }
-    friend ostream& operator << (ostream &pOstream, const Matrix &pMat);
+    friend std::ostream& operator << (std::ostream& pOstream, const Matrix& pMat);
 };
 template <typename T>
-Matrix::Matrix(size_t pRowNum, size_t pColNum, T &&pVec):mRowNum(pRowNum), mColNum(pColNum)
+Matrix::Matrix(size_t pRowNum, size_t pColNum, T&& pVec):mRowNum(pRowNum), mColNum(pColNum)
 {
     mEntries = std::forward<T>(pVec);
 }

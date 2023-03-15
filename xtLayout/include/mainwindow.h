@@ -14,7 +14,7 @@ QT_END_NAMESPACE
 
 class PaintingArea;
 class Shape;
-
+class NavigationTool;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -22,13 +22,13 @@ public:
     void paintEvent(QPaintEvent*) override;
     void keyPressEvent(QKeyEvent*) override;
     bool eventFilter(QObject* obj, QEvent* event) override;
-    void newSelectionTool();
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 public slots:
     void newRectangleTool();
     void switchBackToSelectionTool();
 private:
+    NavigationTool* mNavTool; //TODO: consider unique_ptr
     Ui::MainWindow* ui;
     PaintingArea* mPA;
     QMenu* file_menu;

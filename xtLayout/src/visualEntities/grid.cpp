@@ -1,12 +1,12 @@
 #include "grid.h"
 #include <QPainter>
 #include "globalsetting.h"
-Grid::Grid()
+Grid::Grid(NavigationTool* pNavTool):VisualEntity(pNavTool)
 {
 
 }
 
-void Grid::draw(QPainter *pPainter)
+void Grid::draw(QPainter* pPainter)
 {
     QBrush brush(QColor(0,0,0,255));
     QPen pen(QColor(0,0,0,255));
