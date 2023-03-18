@@ -64,7 +64,12 @@ void RectangleTool::keyPressEvent(QKeyEvent* event)
         case Qt::Key_Escape:
             //delete mRectangle, since it is not stored into database yet, no need to destroy
             mPA->removeVisualEntity(mRectangle);
-            delete mRectangle;
+            if (mRectangle)
+            {
+                delete mRectangle;
+                mRectangle = nullptr;
+                mFirstPointFixed = false;
+            }
             mPA->update();
             break;
         default:

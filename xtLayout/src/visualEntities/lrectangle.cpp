@@ -13,8 +13,12 @@ LRectangle::LRectangle(xtdb::XtRectangle* pRect, NavigationTool* pNavTool):mRect
 
 LRectangle::~LRectangle()
 {
-    getOwnerQuadtreeNode()->deleteObj(this);
-    if (mRect) {
+    if (mOwnerNode)
+    {
+        getOwnerQuadtreeNode()->deleteObj(this);
+    }
+    if (mRect)
+    {
         mRect->destroy();
     }
 }
