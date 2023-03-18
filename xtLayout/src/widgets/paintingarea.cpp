@@ -14,6 +14,7 @@ PaintingArea::PaintingArea(QWidget *parent)
     : QWidget{parent}, mQuadtree(QRect(QPoint(0, 0), GlobalSetting::canvasSize))
 {
     mBlock = xtdb::XtBlock::create();
+    resize(parent->geometry().width(), parent->geometry().height());
 //    insertVisualEntity(new Grid);
     update();
 }

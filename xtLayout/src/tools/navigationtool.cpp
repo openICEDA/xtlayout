@@ -7,7 +7,7 @@
 NavigationTool::NavigationTool(PaintingArea* pPA):Tool(NAVIGATION_TOOL), mPA(pPA)
 {
     mViewport.setTopLeft({100, 100});
-    mViewport.setBottomRight({500, 500});
+    mViewport.setBottomRight({100 + pPA->geometry().width(), 100 + pPA->geometry().height()});
 }
 
 void NavigationTool::keyPressEvent(QKeyEvent* event)
