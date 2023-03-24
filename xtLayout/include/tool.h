@@ -2,6 +2,8 @@
 #define TOOL_H
 #include <QObject>
 #include <QPoint>
+
+class PaintingArea;
 class QMouseEvent;
 class QPainter;
 class QKeyEvent;
@@ -17,10 +19,10 @@ public:
     };
     Tool(tool_type pToolType);
     virtual ~Tool(){};
-    virtual void mousePressEvent(QMouseEvent* event) = 0;
-    virtual void mouseMoveEvent(QMouseEvent* event) = 0;
-    virtual void mouseReleaseEvent(QMouseEvent* event) = 0;
-    virtual void keyPressEvent(QKeyEvent* event) = 0;
+    virtual void mousePressEvent(QMouseEvent* event, PaintingArea* pPA) = 0;
+    virtual void mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA) = 0;
+    virtual void mouseReleaseEvent(QMouseEvent* event, PaintingArea* pPA) = 0;
+    virtual void keyPressEvent(QKeyEvent* event, PaintingArea* pPA) = 0;
     tool_type getToolType(){return mToolType;};
 protected:
     tool_type mToolType;

@@ -15,10 +15,22 @@ QT_END_NAMESPACE
 class PaintingArea;
 class Shape;
 class NavigationTool;
+class QMdiSubWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+private:
+    NavigationTool* mNavTool; //TODO: consider unique_ptr
+    Ui::MainWindow* ui;
+    QMdiSubWindow* mActivePA;
+    QMenu* file_menu;
+    std::vector<Tool*> mActiveTools;
+private:
+    void activateTool(Tool* pTool);
+    void deactivateTool(Tool::tool_type pTool);
+    Tool* findActiveTool(Tool::tool_type pTool);
 public:
+    std::vector<Tool*>& getActiveTools(){return mActiveTools;};
     void paintEvent(QPaintEvent*) override;
     void keyPressEvent(QKeyEvent*) override;
     bool eventFilter(QObject* obj, QEvent* event) override;
@@ -27,10 +39,8 @@ public:
 public slots:
     void newRectangleTool();
     void switchBackToSelectionTool();
-private:
-    NavigationTool* mNavTool; //TODO: consider unique_ptr
-    Ui::MainWindow* ui;
-    PaintingArea* mPA;
-    QMenu* file_menu;
+    void updateActivePA(QMdiSubWindow* pActivePA);
+private slots:
+    void on_actionNew_triggered();
 };
 #endif // MAINWINDOW_H

@@ -4,7 +4,7 @@
 #include <memory>
 #include <QDebug>
 
-SelectionTool::SelectionTool(PaintingArea* pPA, NavigationTool* pNavTool):mIsPressed(false), mPA(pPA), Tool(SELECTION_TOOL), mSelectionBox(nullptr), mNavTool(pNavTool)
+SelectionTool::SelectionTool(PaintingArea* pPA, NavigationTool* pNavTool):mIsPressed(false), Tool(SELECTION_TOOL), mSelectionBox(nullptr), mNavTool(pNavTool)
 {
 }
 
@@ -12,40 +12,40 @@ SelectionTool::~SelectionTool()
 {
 }
 
-void SelectionTool::mousePressEvent(QMouseEvent* event)
+void SelectionTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     mIsPressed = true;
     mSelectionBox = new SelectionBox(mNavTool);
     mFirstPoint = mNavTool->viewportCS2WorldCS(event->pos());
-    mPA->insertVisualEntity(mSelectionBox);
+    pPA->insertVisualEntity(mSelectionBox);
 }
 
-void SelectionTool::mouseMoveEvent(QMouseEvent* event)
+void SelectionTool::mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     if (mIsPressed)
     {//TODO: deselect a selected object when the selection box doesn't contain the object.
-        mPA->getQuadTree().search(mSelectionBox->getZone(), mSelectedObjs);
+        pPA->getQuadTree().search(mSelectionBox->getZone(), mSelectedObjs);
         for(typename QSet<LRectangle*>::iterator it = mSelectedObjs.begin(); it != mSelectedObjs.end(); it++)
         {
             (*it)->setSelected(true);
         }
-        QSet<VisualEntity*>& allVisualEntities = mPA->getAllVisualEntities();
+        QSet<VisualEntity*>& allVisualEntities = pPA->getAllVisualEntities();
 
         mSelectionBox->setFirstPoint(mFirstPoint);
         mSelectionBox->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
-        mPA->update();
+        pPA->update();
     }
 }
 
-void SelectionTool::mouseReleaseEvent(QMouseEvent* event)
+void SelectionTool::mouseReleaseEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     if (mSelectionBox) {
-        mPA->removeVisualEntity(mSelectionBox);
+        pPA->removeVisualEntity(mSelectionBox);
         delete mSelectionBox;
         mSelectionBox = nullptr;
     }
     mIsPressed = false;
-    mPA->update();
+    pPA->update();
 }
 
 void SelectionTool::resetSelectionBox()
@@ -54,18 +54,18 @@ void SelectionTool::resetSelectionBox()
     mIsPressed = false;
 }
 
-void SelectionTool::keyPressEvent(QKeyEvent* event)
+void SelectionTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
 {
     switch(event->key())
     {
         case Qt::Key_Delete:
             for (QSet<LRectangle*>::Iterator it_sel = mSelectedObjs.begin(); it_sel != mSelectedObjs.end(); it_sel++)
             {
-                mPA->removeVisualEntity(*it_sel);
+                pPA->removeVisualEntity(*it_sel);
                 delete *it_sel;
             }
             mSelectedObjs.clear();
-            mPA->update();
+            pPA->update();
             break;
         default:
             break;

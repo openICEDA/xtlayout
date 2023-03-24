@@ -9,12 +9,13 @@
 #include "quadtreenode.h"
 #include "globalsetting.h"
 #include <algorithm>
+#include "mainwindow.h"
 
-PaintingArea::PaintingArea(QWidget *parent)
-    : QWidget{parent}, mQuadtree(QRect(QPoint(0, 0), GlobalSetting::canvasSize))
+PaintingArea::PaintingArea(QWidget* pMainWindow)
+    : QWidget{pMainWindow}, mQuadtree(QRect(QPoint(0, 0), GlobalSetting::canvasSize)), mMainWindow(static_cast<MainWindow*>(pMainWindow))
 {
     mBlock = xtdb::XtBlock::create();
-    resize(parent->geometry().width(), parent->geometry().height());
+    resize(pMainWindow->geometry().width(), pMainWindow->geometry().height());
 //    insertVisualEntity(new Grid);
     update();
 }
@@ -28,33 +29,36 @@ void PaintingArea::paintEvent(QPaintEvent*)
 
 void PaintingArea::mousePressEvent(QMouseEvent* event)
 {
-    for (std::vector<Tool*>::const_iterator it = mActiveTools.cbegin(); it != mActiveTools.cend(); it++)
+    std::vector<Tool*>& activeTools = static_cast<MainWindow*>(mMainWindow)->getActiveTools();
+    for (std::vector<Tool*>::const_iterator it = activeTools.cbegin(); it != activeTools.cend(); it++)
     {
         Tool* tool = *it;
         if (tool) {
-            tool->mousePressEvent(event);
+            tool->mousePressEvent(event, this);
         }
     }
 }
 
 void PaintingArea::mouseMoveEvent(QMouseEvent* event)
 {
-    for (std::vector<Tool*>::const_iterator it = mActiveTools.cbegin(); it != mActiveTools.cend(); it++)
+    std::vector<Tool*>& activeTools = static_cast<MainWindow*>(mMainWindow)->getActiveTools();
+    for (std::vector<Tool*>::const_iterator it = activeTools.cbegin(); it != activeTools.cend(); it++)
     {
         Tool* tool = *it;
         if (tool) {
-            tool->mouseMoveEvent(event);
+            tool->mouseMoveEvent(event, this);
         }
     }
 }
 
 void PaintingArea::mouseReleaseEvent(QMouseEvent* event)
 {
-    for (std::vector<Tool*>::const_iterator it = mActiveTools.cbegin(); it != mActiveTools.cend(); it++)
+    std::vector<Tool*>& activeTools = static_cast<MainWindow*>(mMainWindow)->getActiveTools();
+    for (std::vector<Tool*>::const_iterator it = activeTools.cbegin(); it != activeTools.cend(); it++)
     {
         Tool* tool = *it;
         if (tool) {
-            tool->mouseReleaseEvent(event);
+            tool->mouseReleaseEvent(event, this);
         }
     }
 }
@@ -70,38 +74,6 @@ void PaintingArea::removeVisualEntity(VisualEntity* pVisualEntity)
     if (mAllVisualEntities.cend() != it)
     {
         mAllVisualEntities.erase(it);
-    }
-}
-
-void PaintingArea::deactivateTool(Tool::tool_type pToolType)
-{
-    //TODO: deal with case with tools of same type
-    std::vector<Tool*>::iterator it = std::find_if(mActiveTools.begin(), mActiveTools.end(), [&](const auto& tool){return pToolType == tool->getToolType();});
-    if (mActiveTools.cend() != it)
-    {
-        delete (*it);
-        mActiveTools.erase(it);
-    }
-}
-
-void PaintingArea::activateTool(Tool* pTool)
-{
-    if (!findActiveTool(pTool->getToolType()))
-    {
-        mActiveTools.push_back(pTool);
-    }
-}
-
-Tool* PaintingArea::findActiveTool(Tool::tool_type pToolType)
-{
-    std::vector<Tool*>::iterator it = std::find_if(mActiveTools.begin(), mActiveTools.end(), [&](const auto& tool){return pToolType == tool->getToolType();});
-    if (mActiveTools.cend() != it)
-    {
-        return *it;
-    }
-    else
-    {
-        return nullptr;
     }
 }
 

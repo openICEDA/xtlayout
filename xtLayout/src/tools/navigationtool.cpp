@@ -4,13 +4,13 @@
 #include "paintingarea.h"
 #include "visualentity.h"
 
-NavigationTool::NavigationTool(PaintingArea* pPA):Tool(NAVIGATION_TOOL), mPA(pPA)
+NavigationTool::NavigationTool(PaintingArea* pPA):Tool(NAVIGATION_TOOL)
 {
     mViewport.setTopLeft({100, 100});
     mViewport.setBottomRight({100 + pPA->geometry().width(), 100 + pPA->geometry().height()});
 }
 
-void NavigationTool::keyPressEvent(QKeyEvent* event)
+void NavigationTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
 {
     switch(event->key())
     {
@@ -50,14 +50,14 @@ void NavigationTool::keyPressEvent(QKeyEvent* event)
             break;
     }
     QSet<LRectangle*> rectsInViewport;
-    mPA->searchRects(mViewport, rectsInViewport);
-    QSet<VisualEntity*>& av = mPA->getAllVisualEntities();
+    pPA->searchRects(mViewport, rectsInViewport);
+    QSet<VisualEntity*>& av = pPA->getAllVisualEntities();
     av.clear();
     for (QSet<LRectangle*>::const_iterator it = rectsInViewport.cbegin(); it != rectsInViewport.cend(); it++)
     {
         av.insert(*it);
     }
-    mPA->update();
+    pPA->update();
 }
 
 QPoint NavigationTool::viewportCS2WorldCS(QPoint pPnt)
