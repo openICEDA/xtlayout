@@ -15,7 +15,7 @@
 #include "xtdb.h"
 using namespace xtdb;
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow)
+    : QMainWindow(parent), ui(new Ui::MainWindow), mActivePA(nullptr)
 {
     ui->setupUi(this);
     ui->menubar->setVisible(true);
@@ -41,10 +41,13 @@ void MainWindow::paintEvent(QPaintEvent*)
 
 void MainWindow::newRectangleTool()
 {
-    RectangleTool* rectangleTool = new RectangleTool(static_cast<PaintingArea*>(mActivePA->widget()), mNavTool);
-    activateTool(rectangleTool);
-    deactivateTool(Tool::SELECTION_TOOL);
-    connect(rectangleTool, SIGNAL(completed()), this, SLOT(switchBackToSelectionTool()));
+    if (mActivePA)
+    {
+        RectangleTool* rectangleTool = new RectangleTool(static_cast<PaintingArea*>(mActivePA->widget()), mNavTool);
+        activateTool(rectangleTool);
+        deactivateTool(Tool::SELECTION_TOOL);
+        connect(rectangleTool, SIGNAL(completed()), this, SLOT(switchBackToSelectionTool()));
+    }
 }
 
 void MainWindow::switchBackToSelectionTool()

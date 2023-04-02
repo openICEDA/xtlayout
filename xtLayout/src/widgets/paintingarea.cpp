@@ -6,18 +6,25 @@
 #include "tool.h"
 #include "visualentity.h"
 #include "grid.h"
-#include "quadtreenode.h"
 #include "globalsetting.h"
 #include <algorithm>
 #include "mainwindow.h"
+#include "xtliterals.h"
+#include "xtdb.h"
 
 PaintingArea::PaintingArea(QWidget* pMainWindow)
-    : QWidget{pMainWindow}, mQuadtree(QRect(QPoint(0, 0), GlobalSetting::canvasSize)), mMainWindow(static_cast<MainWindow*>(pMainWindow))
+    : QWidget{pMainWindow}, mMainWindow(static_cast<MainWindow*>(pMainWindow))
 {
     mBlock = xtdb::XtBlock::create();
     resize(pMainWindow->geometry().width(), pMainWindow->geometry().height());
 //    insertVisualEntity(new Grid);
+    mShapeQuery = new ShapeQuery(mBlock);
     update();
+}
+
+PaintingArea::~PaintingArea()
+{
+    delete mShapeQuery;
 }
 
 void PaintingArea::paintEvent(QPaintEvent*)
@@ -77,7 +84,26 @@ void PaintingArea::removeVisualEntity(VisualEntity* pVisualEntity)
     }
 }
 
-void PaintingArea::searchRects(const QRect& pZone, QSet<LRectangle*>& pFoundObjs)
+xtdb::XtBlock* PaintingArea::getBlock()
 {
-    mQuadtree.search(pZone, pFoundObjs);
+    return mBlock;
+}
+
+void PaintingArea::ShapeQuery::onShapeFound(xtdb::XtShape* pShape)
+{
+    //TODO: execute onshapefound inside quadtree, instead of generating result at first, then iterate through it.
+    LShape* shape = static_cast<LShape*>(pShape->getExtendedObj(XTLAYOUT));
+    mFoundObjs.insert(shape);
+}
+
+void PaintingArea::searchShapes(const QRect& pZone, QSet<LShape*>& pFoundObjs)
+{
+    xtdb::XtRect region(pZone.left(), pZone.top(), pZone.right(), pZone.bottom());
+    mShapeQuery->query(region);
+    pFoundObjs = std::move(mShapeQuery->mFoundObjs);
+}
+
+PaintingArea::ShapeQuery::ShapeQuery(xtdb::XtBlock* pBlock):xtdb::XtShapeQuery(pBlock)
+{
+
 }

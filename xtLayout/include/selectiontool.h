@@ -4,14 +4,15 @@
 #include "paintingarea.h"
 #include <memory>
 #include "selectionbox.h"
-#include "lrectangle.h"
+#include "xtshapequery.h"
 
-class SelectionTool: public Tool
+class LShape;
+class SelectionTool : public Tool
 {
 private:
     bool mIsPressed;
     QPoint mFirstPoint;
-    QSet<LRectangle*> mSelectedObjs;
+    QSet<LShape*> mSelectedObjs;
     SelectionBox* mSelectionBox;
     NavigationTool* mNavTool;
 public:

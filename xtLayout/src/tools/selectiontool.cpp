@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <memory>
 #include <QDebug>
+#include "xtliterals.h"
 
 SelectionTool::SelectionTool(PaintingArea* pPA, NavigationTool* pNavTool):mIsPressed(false), Tool(SELECTION_TOOL), mSelectionBox(nullptr), mNavTool(pNavTool)
 {
@@ -23,16 +24,16 @@ void SelectionTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
 void SelectionTool::mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     if (mIsPressed)
-    {//TODO: deselect a selected object when the selection box doesn't contain the object.
-        pPA->getQuadTree().search(mSelectionBox->getZone(), mSelectedObjs);
-        for(typename QSet<LRectangle*>::iterator it = mSelectedObjs.begin(); it != mSelectedObjs.end(); it++)
-        {
-            (*it)->setSelected(true);
-        }
+    {//TODO: deselect selected objects when the selection box doesn't contain them.
+        QPoint secondpnt = mNavTool->viewportCS2WorldCS(event->pos());
         QSet<VisualEntity*>& allVisualEntities = pPA->getAllVisualEntities();
-
         mSelectionBox->setFirstPoint(mFirstPoint);
-        mSelectionBox->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
+        mSelectionBox->setSecondPoint(secondpnt);
+        pPA->searchShapes(mSelectionBox->getZone(), mSelectedObjs);
+        for (QSet<LShape*>::Iterator it_sel = mSelectedObjs.begin(); it_sel != mSelectedObjs.end(); it_sel++)
+        {
+            (*it_sel)->select();
+        }
         pPA->update();
     }
 }
@@ -59,7 +60,7 @@ void SelectionTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
     switch(event->key())
     {
         case Qt::Key_Delete:
-            for (QSet<LRectangle*>::Iterator it_sel = mSelectedObjs.begin(); it_sel != mSelectedObjs.end(); it_sel++)
+            for (QSet<LShape*>::Iterator it_sel = mSelectedObjs.begin(); it_sel != mSelectedObjs.end(); it_sel++)
             {
                 pPA->removeVisualEntity(*it_sel);
                 delete *it_sel;

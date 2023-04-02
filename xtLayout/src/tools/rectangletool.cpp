@@ -7,7 +7,6 @@
 #include "commandcontrol.h"
 #include "drawcommand.h"
 #include "paintingarea.h"
-#include "quadtreenode.h"
 #include "xtdb.h"
 #include "lrectangle.h"
 #include <iostream>
@@ -23,7 +22,7 @@ RectangleTool::~RectangleTool()
 
 void RectangleTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
 {
-    if(!mFirstPointFixed)
+    if (!mFirstPointFixed)
     {
         pPA->setMouseTracking(true);
         mFirstPointFixed = true;
@@ -35,8 +34,7 @@ void RectangleTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
     else
     {
         mRectangle->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
-        pPA->getQuadTree().insert(mRectangle); //TODO: how to avoid getQuadtree?
-        mRectangle->storeToDB(pPA->mBlock);
+        mRectangle->storeToDB(pPA->getBlock());
         pPA->setMouseTracking(false);
         emit completed();
     }
@@ -44,7 +42,7 @@ void RectangleTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
 
 void RectangleTool::mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA)
 {
-    if(nullptr != mRectangle)
+    if (mRectangle)
     {
         mRectangle->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
         pPA->update();
@@ -62,15 +60,15 @@ void RectangleTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
     switch(event->key())
     {
         case Qt::Key_Escape:
-            //delete mRectangle, since it is not stored into database yet, no need to destroy
-            pPA->removeVisualEntity(mRectangle);
             if (mRectangle)
             {
+                //delete mRectangle, since it is not stored into database yet, no need to destroy
+                pPA->removeVisualEntity(mRectangle);
                 delete mRectangle;
                 mRectangle = nullptr;
                 mFirstPointFixed = false;
+                pPA->update();
             }
-            pPA->update();
             break;
         default:
             break;

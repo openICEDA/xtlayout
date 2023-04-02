@@ -6,8 +6,8 @@
 
 NavigationTool::NavigationTool(PaintingArea* pPA):Tool(NAVIGATION_TOOL)
 {
-    mViewport.setTopLeft({100, 100});
-    mViewport.setBottomRight({100 + pPA->geometry().width(), 100 + pPA->geometry().height()});
+    mViewport.setTopLeft({2500, 2500});
+    mViewport.setBottomRight({2500 + pPA->geometry().width(), 2500 + pPA->geometry().height()});
 }
 
 void NavigationTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
@@ -49,11 +49,11 @@ void NavigationTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
         default:
             break;
     }
-    QSet<LRectangle*> rectsInViewport;
-    pPA->searchRects(mViewport, rectsInViewport);
+    QSet<LShape*> shapesInViewport;
+    pPA->searchShapes(mViewport, shapesInViewport);
     QSet<VisualEntity*>& av = pPA->getAllVisualEntities();
     av.clear();
-    for (QSet<LRectangle*>::const_iterator it = rectsInViewport.cbegin(); it != rectsInViewport.cend(); it++)
+    for (QSet<LShape*>::const_iterator it = shapesInViewport.cbegin(); it != shapesInViewport.cend(); it++)
     {
         av.insert(*it);
     }

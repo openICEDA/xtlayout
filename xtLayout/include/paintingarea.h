@@ -4,8 +4,6 @@
 #include <QWidget>
 #include <QSet>
 #include <vector>
-#include "quadtreenode.h"
-#include "xtdb.h"
 #include "lrectangle.h"
 #include "tool.h"
 class MainWindow;
@@ -14,12 +12,24 @@ class PaintingArea : public QWidget
 {
     Q_OBJECT
 private:
+    class ShapeQuery : public xtdb::XtShapeQuery
+    {
+    private:
+        friend class PaintingArea;
+        QSet<LShape*> mFoundObjs;
+    public:
+        ~ShapeQuery(){};
+        ShapeQuery(xtdb::XtBlock* pBlock);
+        void onShapeFound(xtdb::XtShape* pShape) override;
+    };
     QSet<VisualEntity*> mAllVisualEntities;
-    QuadtreeNode<LRectangle*> mQuadtree;
     MainWindow* mMainWindow;
-public:
     xtdb::XtBlock* mBlock; //TODO: fileio
+    ShapeQuery* mShapeQuery;
+public:
+    ~PaintingArea();
     explicit PaintingArea(QWidget* parent = nullptr);
+    xtdb::XtBlock* getBlock();
 //    PaintingArea(MainWindow* pMainWindow);
     void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* event) override;
@@ -28,7 +38,6 @@ public:
     void insertVisualEntity(VisualEntity* pVisualEntity);
     void removeVisualEntity(VisualEntity* pVisualEntity);
     QSet<VisualEntity*>& getAllVisualEntities(){return mAllVisualEntities;};
-    QuadtreeNode<LRectangle*>& getQuadTree(){return mQuadtree;};
-    void searchRects(const QRect& pZone, QSet<LRectangle*>& pFoundObjs);
+    void searchShapes(const QRect& pZone, QSet<LShape*>& pFoundObjs);
 };
 #endif // PAINTINGAREA_H
