@@ -1,7 +1,7 @@
 #include "grid.h"
 #include <QPainter>
 #include "globalsetting.h"
-Grid::Grid(NavigationTool* pNavTool):VisualEntity(pNavTool)
+Grid::Grid()
 {
 
 }

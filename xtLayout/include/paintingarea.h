@@ -26,11 +26,14 @@ private:
     MainWindow* mMainWindow;
     xtdb::XtBlock* mBlock; //TODO: fileio
     ShapeQuery* mShapeQuery;
+    QString mCurFile;
+    QRect mViewport;
 public:
     ~PaintingArea();
     explicit PaintingArea(QWidget* parent = nullptr);
+    QRect getViewport(){return mViewport;};
+    void setViewport(const QRect& pRect){mViewport = pRect;};
     xtdb::XtBlock* getBlock();
-//    PaintingArea(MainWindow* pMainWindow);
     void paintEvent(QPaintEvent*) override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
@@ -39,5 +42,9 @@ public:
     void removeVisualEntity(VisualEntity* pVisualEntity);
     QSet<VisualEntity*>& getAllVisualEntities(){return mAllVisualEntities;};
     void searchShapes(const QRect& pZone, QSet<LShape*>& pFoundObjs);
+    bool saveAs();
+    bool saveFile(const QString &fileName);
+    bool loadFile(const QString &pFileName);
+    QString getCurrentFile(){return mCurFile;};
 };
 #endif // PAINTINGAREA_H

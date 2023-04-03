@@ -9,7 +9,7 @@ protected:
     NavigationTool* mNavTool;
 public:
     virtual void draw(QPainter* pPainter) = 0;
-    VisualEntity(NavigationTool* pNavTool);
+    VisualEntity();
 };
 
 #endif // VISUALENTITY_H

@@ -23,7 +23,6 @@ public:
     void mouseReleaseEvent(QMouseEvent* event, PaintingArea* pPA) override;
     void keyPressEvent(QKeyEvent* event, PaintingArea* pPA) override;
     bool isPressed(){return mIsPressed;};
-    void resetSelectionBox();
 };
 
 #endif // SELECTTOOL_H

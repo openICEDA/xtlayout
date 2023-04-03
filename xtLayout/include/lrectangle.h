@@ -15,9 +15,9 @@ public:
     int x2;
     int y2;
 public:
-    LRectangle(NavigationTool* pTool);
+    LRectangle();
     ~LRectangle() override;
-    LRectangle(xtdb::XtRectangle* pRect, NavigationTool* pTool);
+    LRectangle(xtdb::XtRectangle* pRect);
     void draw(QPainter* pPainter) override;
     void storeToDB(xtdb::XtBlock* pBlock);
     QPoint getFirstPoint();

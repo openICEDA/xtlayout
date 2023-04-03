@@ -8,7 +8,7 @@ class LShape : public VisualEntity
 private:
     bool mIsSelected;
 protected:
-    LShape(NavigationTool* pNavTool);
+    LShape();
 public:
     virtual ~LShape(){};
     void select();

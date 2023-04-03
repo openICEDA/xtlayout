@@ -18,6 +18,7 @@ RectangleTool::RectangleTool(PaintingArea* pPA, NavigationTool* pNavTool):mFirst
 
 RectangleTool::~RectangleTool()
 {
+    //Don't delete mRectangle here, since mRectangle is inserted into allvisualentities
 }
 
 void RectangleTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
@@ -26,14 +27,14 @@ void RectangleTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
     {
         pPA->setMouseTracking(true);
         mFirstPointFixed = true;
-        mRectangle = new LRectangle(mNavTool);
-        mRectangle->setFirstPoint(mNavTool->viewportCS2WorldCS(event->pos()));
-        mRectangle->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
+        mRectangle = new LRectangle;
+        mRectangle->setFirstPoint(NavigationTool::viewportCS2WorldCS(event->pos(), pPA));
+        mRectangle->setSecondPoint(NavigationTool::viewportCS2WorldCS(event->pos(), pPA));
         pPA->insertVisualEntity(mRectangle);
     }
     else
     {
-        mRectangle->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
+        mRectangle->setSecondPoint(NavigationTool::viewportCS2WorldCS(event->pos(), pPA));
         mRectangle->storeToDB(pPA->getBlock());
         pPA->setMouseTracking(false);
         emit completed();
@@ -44,7 +45,7 @@ void RectangleTool::mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     if (mRectangle)
     {
-        mRectangle->setSecondPoint(mNavTool->viewportCS2WorldCS(event->pos()));
+        mRectangle->setSecondPoint(NavigationTool::viewportCS2WorldCS(event->pos(), pPA));
         pPA->update();
     }
 }
@@ -57,6 +58,7 @@ void RectangleTool::mouseReleaseEvent(QMouseEvent* event, PaintingArea* pPA)
 
 void RectangleTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
 {
+    //TODO: esc to stop tool
     switch(event->key())
     {
         case Qt::Key_Escape:

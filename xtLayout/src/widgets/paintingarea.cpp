@@ -11,9 +11,13 @@
 #include "mainwindow.h"
 #include "xtliterals.h"
 #include "xtdb.h"
+#include <QFileDialog>
+#include <QGuiApplication>
+#include <QSaveFile>
+#include <QMessageBox>
 
 PaintingArea::PaintingArea(QWidget* pMainWindow)
-    : QWidget{pMainWindow}, mMainWindow(static_cast<MainWindow*>(pMainWindow))
+    : QWidget{pMainWindow}, mMainWindow(static_cast<MainWindow*>(pMainWindow)), mViewport(5000, 5000, pMainWindow->geometry().width(), pMainWindow->geometry().height())
 {
     mBlock = xtdb::XtBlock::create();
     resize(pMainWindow->geometry().width(), pMainWindow->geometry().height());
@@ -24,6 +28,7 @@ PaintingArea::PaintingArea(QWidget* pMainWindow)
 
 PaintingArea::~PaintingArea()
 {
+    xtdb::XtBlock::destroy(mBlock);
     delete mShapeQuery;
 }
 
@@ -40,7 +45,8 @@ void PaintingArea::mousePressEvent(QMouseEvent* event)
     for (std::vector<Tool*>::const_iterator it = activeTools.cbegin(); it != activeTools.cend(); it++)
     {
         Tool* tool = *it;
-        if (tool) {
+        if (tool)
+        {
             tool->mousePressEvent(event, this);
         }
     }
@@ -52,7 +58,8 @@ void PaintingArea::mouseMoveEvent(QMouseEvent* event)
     for (std::vector<Tool*>::const_iterator it = activeTools.cbegin(); it != activeTools.cend(); it++)
     {
         Tool* tool = *it;
-        if (tool) {
+        if (tool)
+        {
             tool->mouseMoveEvent(event, this);
         }
     }
@@ -64,7 +71,8 @@ void PaintingArea::mouseReleaseEvent(QMouseEvent* event)
     for (std::vector<Tool*>::const_iterator it = activeTools.cbegin(); it != activeTools.cend(); it++)
     {
         Tool* tool = *it;
-        if (tool) {
+        if (tool)
+        {
             tool->mouseReleaseEvent(event, this);
         }
     }
@@ -106,4 +114,41 @@ void PaintingArea::searchShapes(const QRect& pZone, QSet<LShape*>& pFoundObjs)
 PaintingArea::ShapeQuery::ShapeQuery(xtdb::XtBlock* pBlock):xtdb::XtShapeQuery(pBlock)
 {
 
+}
+
+bool PaintingArea::saveAs()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save As"), mCurFile);
+    if (fileName.isEmpty())
+    {
+        return false;
+    }
+    return saveFile(fileName);
+}
+
+bool PaintingArea::saveFile(const QString& pFileName)
+{
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    mBlock->write(pFileName.toStdString().c_str());
+    QGuiApplication::restoreOverrideCursor();
+    mCurFile = QFileInfo(pFileName).canonicalFilePath();
+    return true;
+}
+
+bool PaintingArea::loadFile(const QString &pFileName)
+{
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    mBlock->load(pFileName.toStdString().c_str());
+    xtdb::XtSet<xtdb::XtShape*> allShapes = mBlock->getAllShapes();
+    for (xtdb::XtIterator<xtdb::XtShape*> shapeIt = allShapes.begin(); shapeIt != allShapes.end(); shapeIt++)
+    {
+        //TODO: get class ID and cast to the corresponding class
+        xtdb::XtRectangle* xtrect = static_cast<xtdb::XtRectangle*>(*shapeIt);
+        LRectangle* lrect = new LRectangle(xtrect);
+        insertVisualEntity(lrect);
+    }
+    QGuiApplication::restoreOverrideCursor();
+    mCurFile = QFileInfo(pFileName).canonicalFilePath();
+    update();
+    return true;
 }

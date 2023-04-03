@@ -8,6 +8,7 @@
 #include <QKeyEvent>
 #include <QToolButton>
 #include <QMdiSubWindow>
+#include <QFileDialog>
 #include "drawcommand.h"
 #include "rectangletool.h"
 #include "selectiontool.h"
@@ -85,15 +86,21 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actionNew_triggered()
+PaintingArea* MainWindow::createPaintingArea()
 {
     PaintingArea* pa = new PaintingArea(this);
     QMdiSubWindow* paSubWindow = ui->mdiArea->addSubWindow(pa);
-    mNavTool = new NavigationTool(pa);
+    mNavTool = new NavigationTool;
     activateTool(new SelectionTool(pa, mNavTool));
     activateTool(mNavTool);
     updateActivePA(paSubWindow);
     pa->show();
+    return pa;
+}
+
+void MainWindow::on_actionNew_triggered()
+{
+    createPaintingArea();
 }
 
 void MainWindow::deactivateTool(Tool::tool_type pToolType)
@@ -131,4 +138,66 @@ Tool* MainWindow::findActiveTool(Tool::tool_type pToolType)
 void MainWindow::updateActivePA(QMdiSubWindow* pActivePA)
 {
     mActivePA = pActivePA;
+}
+
+void MainWindow::on_actionSave_triggered()
+{
+    PaintingArea* activePA = static_cast<PaintingArea*>(mActivePA->widget());
+    if (activePA && activePA->saveAs())
+    {
+        statusBar()->showMessage(tr("File saved"), 2000);
+//        MainWindow::prependToRecentFiles(child->currentFile());
+    }
+}
+
+void MainWindow::on_actionOpen_triggered()
+{
+    const QString fileName = QFileDialog::getOpenFileName(this);
+    if (!fileName.isEmpty())
+        openFile(fileName);
+}
+
+bool MainWindow::openFile(const QString& pFileName)
+{
+    if (QMdiSubWindow *existing = findMdiChild(pFileName))
+    {
+        ui->mdiArea->setActiveSubWindow(existing);
+        return true;
+    }
+    const bool succeeded = loadFile(pFileName);
+    if (succeeded)
+        statusBar()->showMessage(tr("File loaded"), 2000);
+    return succeeded;
+}
+
+QMdiSubWindow *MainWindow::findMdiChild(const QString& pFileName) const
+{
+    QString canonicalFilePath = QFileInfo(pFileName).canonicalFilePath();
+
+    const QList<QMdiSubWindow *> subWindows = ui->mdiArea->subWindowList();
+    for (QMdiSubWindow* window : subWindows)
+    {
+        PaintingArea* pa = static_cast<PaintingArea*>(window->widget());
+        if (pa->getCurrentFile() == canonicalFilePath)
+        {
+            return window;
+        }
+    }
+    return nullptr;
+}
+
+bool MainWindow::loadFile(const QString& pFileName)
+{
+    PaintingArea* pa = createPaintingArea();
+    const bool succeeded = pa->loadFile(pFileName);
+    if (succeeded)
+    {
+        pa->show();
+    }
+    else
+    {
+        pa->close();
+    }
+//    MainWindow::prependToRecentFiles(pFileName);
+    return succeeded;
 }

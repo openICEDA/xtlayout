@@ -2,14 +2,16 @@
 #include "navigationtool.h"
 #include "xtliterals.h"
 #include <QPainter>
+#include "paintingarea.h"
 
-LRectangle::LRectangle(NavigationTool* pNavTool):x1(0), y1(0), x2(0), y2(0), mRect(nullptr), LShape(pNavTool)
+LRectangle::LRectangle():x1(0), y1(0), x2(0), y2(0), mRect(nullptr)
 {
 
 }
 
-LRectangle::LRectangle(xtdb::XtRectangle* pRect, NavigationTool* pNavTool):mRect(pRect), LShape(pNavTool)
+LRectangle::LRectangle(xtdb::XtRectangle* pRect):mRect(pRect)
 {
+    mRect->setExtendedObj(XTLAYOUT, this);
 }
 
 LRectangle::~LRectangle()
@@ -65,5 +67,5 @@ void LRectangle::draw(QPainter* pPainter)
     } else {
         pPainter->setBrush(QBrush(QColor(255, 0, 0), Qt::SolidPattern));
     }
-    pPainter->drawRect(mNavTool->worldCS2ViewportCS(getZone()));
+    pPainter->drawRect(NavigationTool::worldCS2ViewportCS(getZone(), static_cast<PaintingArea*>(pPainter->device())));
 }

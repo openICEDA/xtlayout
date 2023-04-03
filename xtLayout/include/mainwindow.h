@@ -30,6 +30,10 @@ private:
     void deactivateTool(Tool::tool_type pTool);
     Tool* findActiveTool(Tool::tool_type pTool);
 public:
+    PaintingArea* createPaintingArea();
+    bool openFile(const QString& pFileName);
+    QMdiSubWindow* findMdiChild(const QString &fileName) const;
+    bool loadFile(const QString& pFileName);
     std::vector<Tool*>& getActiveTools(){return mActiveTools;};
     void paintEvent(QPaintEvent*) override;
     void keyPressEvent(QKeyEvent*) override;
@@ -42,5 +46,7 @@ public slots:
     void updateActivePA(QMdiSubWindow* pActivePA);
 private slots:
     void on_actionNew_triggered();
+    void on_actionSave_triggered();
+    void on_actionOpen_triggered();
 };
 #endif // MAINWINDOW_H

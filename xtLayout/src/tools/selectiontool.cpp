@@ -16,8 +16,8 @@ SelectionTool::~SelectionTool()
 void SelectionTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     mIsPressed = true;
-    mSelectionBox = new SelectionBox(mNavTool);
-    mFirstPoint = mNavTool->viewportCS2WorldCS(event->pos());
+    mSelectionBox = new SelectionBox;
+    mFirstPoint = NavigationTool::viewportCS2WorldCS(event->pos(), pPA);
     pPA->insertVisualEntity(mSelectionBox);
 }
 
@@ -25,7 +25,7 @@ void SelectionTool::mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     if (mIsPressed)
     {//TODO: deselect selected objects when the selection box doesn't contain them.
-        QPoint secondpnt = mNavTool->viewportCS2WorldCS(event->pos());
+        QPoint secondpnt = NavigationTool::viewportCS2WorldCS(event->pos(), pPA);
         QSet<VisualEntity*>& allVisualEntities = pPA->getAllVisualEntities();
         mSelectionBox->setFirstPoint(mFirstPoint);
         mSelectionBox->setSecondPoint(secondpnt);
@@ -47,12 +47,6 @@ void SelectionTool::mouseReleaseEvent(QMouseEvent* event, PaintingArea* pPA)
     }
     mIsPressed = false;
     pPA->update();
-}
-
-void SelectionTool::resetSelectionBox()
-{
-    mSelectionBox->reset();
-    mIsPressed = false;
 }
 
 void SelectionTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)

@@ -7,7 +7,7 @@ class QPainter;
 class Grid : public VisualEntity
 {
 public:
-    Grid(NavigationTool* pNavTool);
+    Grid();
     void draw(QPainter* pPainter) override;
 };
 

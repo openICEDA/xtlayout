@@ -4,53 +4,43 @@
 #include "paintingarea.h"
 #include "visualentity.h"
 
-NavigationTool::NavigationTool(PaintingArea* pPA):Tool(NAVIGATION_TOOL)
+NavigationTool::NavigationTool():Tool(NAVIGATION_TOOL)
 {
-    mViewport.setTopLeft({2500, 2500});
-    mViewport.setBottomRight({2500 + pPA->geometry().width(), 2500 + pPA->geometry().height()});
 }
 
 void NavigationTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
 {
+    QPoint moveVector;
     switch(event->key())
     {
         case Qt::Key_Up:
         {
-            QPoint resFirstPnt = MatUtil::translate(QPoint(0, -50), mViewport.topLeft());
-            QPoint resSecondPnt = MatUtil::translate(QPoint(0, -50), mViewport.bottomRight());
-            mViewport.setTopLeft(resFirstPnt);
-            mViewport.setBottomRight(resSecondPnt);
+            moveVector = QPoint(0, -50);
             break;
         }
         case Qt::Key_Down:
         {
-            QPoint resFirstPnt = MatUtil::translate(QPoint(0, 50), mViewport.topLeft());
-            QPoint resSecondPnt = MatUtil::translate(QPoint(0, 50), mViewport.bottomRight());
-            mViewport.setTopLeft(resFirstPnt);
-            mViewport.setBottomRight(resSecondPnt);
+            moveVector = QPoint(0, 50);
             break;
         }
         case Qt::Key_Left:
         {
-            QPoint resFirstPnt = MatUtil::translate(QPoint(-50, 0), mViewport.topLeft());
-            QPoint resSecondPnt = MatUtil::translate(QPoint(-50, 0), mViewport.bottomRight());
-            mViewport.setTopLeft(resFirstPnt);
-            mViewport.setBottomRight(resSecondPnt);
+            moveVector = QPoint(-50, 0);
             break;
         }
         case Qt::Key_Right:
         {
-            QPoint resFirstPnt = MatUtil::translate(QPoint(50, 0), mViewport.topLeft());
-            QPoint resSecondPnt = MatUtil::translate(QPoint(50, 0), mViewport.bottomRight());
-            mViewport.setTopLeft(resFirstPnt);
-            mViewport.setBottomRight(resSecondPnt);
+            moveVector = QPoint(50, 0);
             break;
         }
         default:
             break;
     }
+    QPoint movedFirstPnt = MatUtil::translate(moveVector, pPA->getViewport().topLeft());
+    QPoint movedSecondPnt = MatUtil::translate(moveVector, pPA->getViewport().bottomRight());
+    pPA->setViewport({movedFirstPnt, movedSecondPnt});
     QSet<LShape*> shapesInViewport;
-    pPA->searchShapes(mViewport, shapesInViewport);
+    pPA->searchShapes(pPA->getViewport(), shapesInViewport);
     QSet<VisualEntity*>& av = pPA->getAllVisualEntities();
     av.clear();
     for (QSet<LShape*>::const_iterator it = shapesInViewport.cbegin(); it != shapesInViewport.cend(); it++)
@@ -60,39 +50,39 @@ void NavigationTool::keyPressEvent(QKeyEvent* event, PaintingArea* pPA)
     pPA->update();
 }
 
-QPoint NavigationTool::viewportCS2WorldCS(QPoint pPnt)
+QPoint NavigationTool::viewportCS2WorldCS(const QPoint& pPnt, PaintingArea* pPA)
 {
-    return pPnt + mViewport.topLeft(); //TODO: consider scalation
+    return pPnt + pPA->getViewport().topLeft(); //TODO: consider scalation
 }
 
-QRect NavigationTool::viewportCS2WorldCS(const QRect& pRects)
+QRect NavigationTool::viewportCS2WorldCS(const QRect& pRects, PaintingArea* pPA)
 {
-    return QRect(pRects.topLeft() + mViewport.topLeft(), pRects.bottomRight() + mViewport.topLeft()); //TODO: consider scaling
+    return QRect(pRects.topLeft() + pPA->getViewport().topLeft(), pRects.bottomRight() + pPA->getViewport().topLeft()); //TODO: consider scaling
 }
 
-std::vector<QPoint> NavigationTool::viewportCS2WorldCS(const std::vector<QPoint>& pPnts)
+std::vector<QPoint> NavigationTool::viewportCS2WorldCS(const std::vector<QPoint>& pPnts, PaintingArea* pPA)
 {
     std::vector<QPoint> pntsInWorldCS;
     pntsInWorldCS.reserve(pPnts.size());
-    std::for_each(pntsInWorldCS.cbegin(), pntsInWorldCS.cend(), [&](auto& pnt){pntsInWorldCS.push_back(viewportCS2WorldCS(pnt));});
+    std::for_each(pntsInWorldCS.cbegin(), pntsInWorldCS.cend(), [&](auto& pnt){pntsInWorldCS.push_back(viewportCS2WorldCS(pnt, pPA));});
     return pntsInWorldCS; //TODO: consider scalation
 }
 
-QPoint NavigationTool::worldCS2ViewportCS(QPoint pPnt)
+QPoint NavigationTool::worldCS2ViewportCS(const QPoint& pPnt, PaintingArea* pPA)
 {
-    return pPnt - mViewport.topLeft(); //TODO: consider scalation
+    return pPnt - pPA->getViewport().topLeft(); //TODO: consider scalation
 }
 
-QRect NavigationTool::worldCS2ViewportCS(const QRect& pRects)
+QRect NavigationTool::worldCS2ViewportCS(const QRect& pRects, PaintingArea* pPA)
 {
-    return QRect(pRects.topLeft() - mViewport.topLeft(), pRects.bottomRight() - mViewport.topLeft()); //TODO: consider scaling
+    return QRect(pRects.topLeft() - pPA->getViewport().topLeft(), pRects.bottomRight() - pPA->getViewport().topLeft()); //TODO: consider scaling
 }
 
-std::vector<QPoint> NavigationTool::worldCS2ViewportCS(const std::vector<QPoint>& pPnts)
+std::vector<QPoint> NavigationTool::worldCS2ViewportCS(const std::vector<QPoint>& pPnts, PaintingArea* pPA)
 {
     std::vector<QPoint> pntsInWorldCS;
     pntsInWorldCS.reserve(pPnts.size());
-    std::for_each(pntsInWorldCS.cbegin(), pntsInWorldCS.cend(), [&](auto& pnt){pntsInWorldCS.push_back(worldCS2ViewportCS(pnt));});
+    std::for_each(pntsInWorldCS.cbegin(), pntsInWorldCS.cend(), [&](auto& pnt){pntsInWorldCS.push_back(worldCS2ViewportCS(pnt, pPA));});
     return pntsInWorldCS; //TODO: consider scalation
 }
 

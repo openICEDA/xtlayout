@@ -1,7 +1,7 @@
 #ifndef SELECTIONBOX_H
 #define SELECTIONBOX_H
 
-#include <visualentity.h>
+#include "visualentity.h"
 #include <QRect>
 
 class NavigationTool;
@@ -10,7 +10,7 @@ class SelectionBox : public VisualEntity
 private:
     QRect mRect;
 public:
-    SelectionBox(NavigationTool* pNavTool);
+    SelectionBox();
     QRect getZone(){return mRect;};
     void setFirstPoint(const QPoint &pPoint){mRect.setTopLeft(pPoint);};
     void setSecondPoint(const QPoint &pPoint){mRect.setBottomRight(pPoint);};
