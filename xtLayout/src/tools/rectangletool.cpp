@@ -11,7 +11,7 @@
 #include "lrectangle.h"
 #include <iostream>
 using namespace xtdb;
-RectangleTool::RectangleTool(PaintingArea* pPA, NavigationTool* pNavTool):mFirstPointFixed(false), Tool(RECTANGLE_TOOL), mRectangle(nullptr), mNavTool(pNavTool)
+RectangleTool::RectangleTool(PaintingArea* pPA):mFirstPointFixed(false), Tool(RECTANGLE_TOOL), mRectangle(nullptr)
 {
 
 }

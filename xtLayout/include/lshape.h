@@ -12,7 +12,7 @@ protected:
 public:
     virtual ~LShape(){};
     void select();
-    void unselect();
+    void deselect();
     bool isSelected();
 };
 
@@ -21,7 +21,7 @@ inline void LShape::select()
     mIsSelected = true;
 }
 
-inline void LShape::unselect()
+inline void LShape::deselect()
 {
     mIsSelected = false;
 }

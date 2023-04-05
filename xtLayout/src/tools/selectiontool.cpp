@@ -5,7 +5,7 @@
 #include <QDebug>
 #include "xtliterals.h"
 
-SelectionTool::SelectionTool(PaintingArea* pPA, NavigationTool* pNavTool):mIsPressed(false), Tool(SELECTION_TOOL), mSelectionBox(nullptr), mNavTool(pNavTool)
+SelectionTool::SelectionTool():mIsPressed(false), Tool(SELECTION_TOOL), mSelectionBox(nullptr)
 {
 }
 
@@ -17,23 +17,36 @@ void SelectionTool::mousePressEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     mIsPressed = true;
     mSelectionBox = new SelectionBox;
-    mFirstPoint = NavigationTool::viewportCS2WorldCS(event->pos(), pPA);
+    mFirstPointViewportCS = event->pos();
     pPA->insertVisualEntity(mSelectionBox);
 }
 
 void SelectionTool::mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA)
 {
     if (mIsPressed)
-    {//TODO: deselect selected objects when the selection box doesn't contain them.
+    {
         QPoint secondpnt = NavigationTool::viewportCS2WorldCS(event->pos(), pPA);
-        QSet<VisualEntity*>& allVisualEntities = pPA->getAllVisualEntities();
-        mSelectionBox->setFirstPoint(mFirstPoint);
+        QPoint firstpnt = NavigationTool::viewportCS2WorldCS(mFirstPointViewportCS, pPA);
+        mSelectionBox->setFirstPoint(firstpnt);
         mSelectionBox->setSecondPoint(secondpnt);
+        QSet<LShape*> shapesInLeftOuterRegion;
+        QSet<LShape*> shapesInRightOuterRegion;
+        QSet<LShape*> shapesInUpperOuterRegion;
+        QSet<LShape*> shapesInBottomOuterRegion;
+        QRect leftOuterRegion(NavigationTool::viewportCS2WorldCS({0, 0}, pPA), NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), pPA->geometry().height()}, pPA));
+        QRect rightOuterRegion(NavigationTool::viewportCS2WorldCS({secondpnt.x(), 0}, pPA), NavigationTool::viewportCS2WorldCS({pPA->geometry().width(), pPA->geometry().height()}, pPA));
+        QRect upperOuterRegion(NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), 0}, pPA), NavigationTool::viewportCS2WorldCS({secondpnt.x(), mFirstPointViewportCS.y()}, pPA));
+        QRect bottomOuterRegion(NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), secondpnt.y()}, pPA), NavigationTool::viewportCS2WorldCS({secondpnt.x(), pPA->geometry().height()}, pPA));
+        pPA->searchShapes(leftOuterRegion, shapesInLeftOuterRegion);
+        pPA->searchShapes(rightOuterRegion, shapesInRightOuterRegion);
+        pPA->searchShapes(upperOuterRegion, shapesInUpperOuterRegion);
+        pPA->searchShapes(bottomOuterRegion, shapesInBottomOuterRegion);
+        std::for_each(shapesInLeftOuterRegion.begin(), shapesInLeftOuterRegion.end(), [](LShape* shape){shape->deselect();});
+        std::for_each(shapesInRightOuterRegion.begin(), shapesInRightOuterRegion.end(), [](LShape* shape){shape->deselect();});
+        std::for_each(shapesInUpperOuterRegion.begin(), shapesInUpperOuterRegion.end(), [](LShape* shape){shape->deselect();});
+        std::for_each(shapesInBottomOuterRegion.begin(), shapesInBottomOuterRegion.end(), [](LShape* shape){shape->deselect();});
         pPA->searchShapes(mSelectionBox->getZone(), mSelectedObjs);
-        for (QSet<LShape*>::Iterator it_sel = mSelectedObjs.begin(); it_sel != mSelectedObjs.end(); it_sel++)
-        {
-            (*it_sel)->select();
-        }
+        std::for_each(mSelectedObjs.begin(), mSelectedObjs.end(), [](LShape* shape){shape->select();});
         pPA->update();
     }
 }

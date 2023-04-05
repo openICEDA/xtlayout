@@ -19,9 +19,8 @@ private:
     GlobalSetting::layer_type mLayer;
     bool mFirstPointFixed;
     LRectangle* mRectangle;
-    NavigationTool* mNavTool;
 public:
-    RectangleTool(PaintingArea* pPA, NavigationTool* pNavTool);
+    RectangleTool(PaintingArea* pPA);
     ~RectangleTool() override;
     void mousePressEvent(QMouseEvent* event, PaintingArea* pPA) override;
     void mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA) override;

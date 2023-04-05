@@ -104,10 +104,11 @@ void PaintingArea::ShapeQuery::onShapeFound(xtdb::XtShape* pShape)
     mFoundObjs.insert(shape);
 }
 
-void PaintingArea::searchShapes(const QRect& pZone, QSet<LShape*>& pFoundObjs)
+void PaintingArea::searchShapes(const QRect& pZone, QSet<LShape*>& pFoundObjs, bool ONLY_FULLY_CONTAINED)
 {
+    pFoundObjs.clear();
     xtdb::XtRect region(pZone.left(), pZone.top(), pZone.right(), pZone.bottom());
-    mShapeQuery->query(region);
+    mShapeQuery->query(region, ONLY_FULLY_CONTAINED);
     pFoundObjs = std::move(mShapeQuery->mFoundObjs);
 }
 

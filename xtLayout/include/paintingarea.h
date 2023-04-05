@@ -41,7 +41,7 @@ public:
     void insertVisualEntity(VisualEntity* pVisualEntity);
     void removeVisualEntity(VisualEntity* pVisualEntity);
     QSet<VisualEntity*>& getAllVisualEntities(){return mAllVisualEntities;};
-    void searchShapes(const QRect& pZone, QSet<LShape*>& pFoundObjs);
+    void searchShapes(const QRect& pZone, QSet<LShape*>& pFoundObjs, bool ONLY_FULLY_CONTAINED = false);
     bool saveAs();
     bool saveFile(const QString &fileName);
     bool loadFile(const QString &pFileName);

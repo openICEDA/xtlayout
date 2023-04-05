@@ -20,7 +20,6 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private:
-    NavigationTool* mNavTool; //TODO: consider unique_ptr
     Ui::MainWindow* ui;
     QMdiSubWindow* mActivePA;
     QMenu* file_menu;

@@ -11,12 +11,11 @@ class SelectionTool : public Tool
 {
 private:
     bool mIsPressed;
-    QPoint mFirstPoint;
+    QPoint mFirstPointViewportCS;
     QSet<LShape*> mSelectedObjs;
     SelectionBox* mSelectionBox;
-    NavigationTool* mNavTool;
 public:
-    SelectionTool(PaintingArea* pPA, NavigationTool* pNavTool);
+    SelectionTool();
     ~SelectionTool() override;
     void mousePressEvent(QMouseEvent* event, PaintingArea* pPA) override;
     void mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA) override;

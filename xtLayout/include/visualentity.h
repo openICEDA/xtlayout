@@ -5,8 +5,6 @@ class QPainter;
 class NavigationTool;
 class VisualEntity
 {
-protected:
-    NavigationTool* mNavTool;
 public:
     virtual void draw(QPainter* pPainter) = 0;
     VisualEntity();

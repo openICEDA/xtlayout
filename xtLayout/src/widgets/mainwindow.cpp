@@ -24,16 +24,15 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui->mdiArea, &QMdiArea::subWindowActivated, this, &MainWindow::updateActivePA);
 
     QToolButton *rectToolButton = new QToolButton(this);
-    QToolButton *selectToolButton = new QToolButton(this);
     ui->toolBar->addWidget(rectToolButton);
-    ui->toolBar->addWidget(selectToolButton);
     rectToolButton->setText("Rectangle");
     rectToolButton->setShortcut(QKeySequence("R"));
-    selectToolButton->setText("Select");
     connect(rectToolButton, SIGNAL(clicked()), this, SLOT(newRectangleTool()));
-    connect(selectToolButton, SIGNAL(clicked()), this, SLOT(newRectangleTool()));
     qApp->installEventFilter(this);
     setFocusPolicy(Qt::StrongFocus);
+
+    activateTool(new SelectionTool);
+    activateTool(new NavigationTool);
 }
 
 void MainWindow::paintEvent(QPaintEvent*)
@@ -44,7 +43,7 @@ void MainWindow::newRectangleTool()
 {
     if (mActivePA)
     {
-        RectangleTool* rectangleTool = new RectangleTool(static_cast<PaintingArea*>(mActivePA->widget()), mNavTool);
+        RectangleTool* rectangleTool = new RectangleTool(static_cast<PaintingArea*>(mActivePA->widget()));
         activateTool(rectangleTool);
         deactivateTool(Tool::SELECTION_TOOL);
         connect(rectangleTool, SIGNAL(completed()), this, SLOT(switchBackToSelectionTool()));
@@ -54,7 +53,7 @@ void MainWindow::newRectangleTool()
 void MainWindow::switchBackToSelectionTool()
 {
     deactivateTool(Tool::RECTANGLE_TOOL);
-    activateTool(new SelectionTool(static_cast<PaintingArea*>(mActivePA->widget()), mNavTool));
+    activateTool(new SelectionTool);
 }
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event)
@@ -82,7 +81,8 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
 
 MainWindow::~MainWindow()
 {
-    delete mNavTool;
+    std::for_each(mActiveTools.begin(), mActiveTools.end(), [](Tool* tool){delete tool;});
+    mActiveTools.clear();
     delete ui;
 }
 
@@ -90,9 +90,6 @@ PaintingArea* MainWindow::createPaintingArea()
 {
     PaintingArea* pa = new PaintingArea(this);
     QMdiSubWindow* paSubWindow = ui->mdiArea->addSubWindow(pa);
-    mNavTool = new NavigationTool;
-    activateTool(new SelectionTool(pa, mNavTool));
-    activateTool(mNavTool);
     updateActivePA(paSubWindow);
     pa->show();
     return pa;
