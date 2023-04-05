@@ -12,6 +12,10 @@ LRectangle::LRectangle():x1(0), y1(0), x2(0), y2(0), mRect(nullptr)
 LRectangle::LRectangle(xtdb::XtRectangle* pRect):mRect(pRect)
 {
     mRect->setExtendedObj(XTLAYOUT, this);
+    x1 = mRect->getX1();
+    y1 = mRect->getY1();
+    x2 = mRect->getX2();
+    y2 = mRect->getY2();
 }
 
 LRectangle::~LRectangle()
