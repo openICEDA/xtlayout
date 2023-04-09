@@ -41,10 +41,10 @@ void NavigationTool::keyPressEvent(QKeyEvent* event, LBlock* pBlock)
     pBlock->setViewport({movedFirstPnt, movedSecondPnt});
     QSet<LShape*> shapesInViewport;
     pBlock->searchShapes(pBlock->getViewport(), shapesInViewport);
-    pBlock->clearAllVisualEntities();
+    pBlock->clearVisualEntitiesInViewport();
     for (QSet<LShape*>::const_iterator it = shapesInViewport.cbegin(); it != shapesInViewport.cend(); it++)
     {
-        pBlock->insertVisualEntity(*it);
+        pBlock->insertVisualEntityInViewport(*it);
     }
 }
 

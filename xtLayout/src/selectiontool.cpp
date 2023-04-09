@@ -20,7 +20,7 @@ void SelectionTool::mousePressEvent(QMouseEvent* event, LBlock* pBlock)
     mIsPressed = true;
     mSelectionBox = new SelectionBox;
     mFirstPointViewportCS = event->pos();
-    pBlock->insertVisualEntity(mSelectionBox);
+    pBlock->insertVisualEntityInViewport(mSelectionBox);
 }
 
 void SelectionTool::mouseMoveEvent(QMouseEvent* event, LBlock* pBlock)
@@ -39,14 +39,10 @@ void SelectionTool::mouseMoveEvent(QMouseEvent* event, LBlock* pBlock)
         QRect rightOuterRegion(NavigationTool::viewportCS2WorldCS({event->pos().x(), 0}, pBlock), NavigationTool::viewportCS2WorldCS({pBlock->getViewport().width(), pBlock->getViewport().height()}, pBlock));
         QRect upperOuterRegion(NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), 0}, pBlock), NavigationTool::viewportCS2WorldCS({event->pos().x(), mFirstPointViewportCS.y()}, pBlock));
         QRect bottomOuterRegion(NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), event->pos().y()}, pBlock), NavigationTool::viewportCS2WorldCS({event->pos().x(), pBlock->getViewport().height()}, pBlock));
-        pBlock->searchShapes(leftOuterRegion, shapesInLeftOuterRegion);
-        pBlock->searchShapes(rightOuterRegion, shapesInRightOuterRegion);
-        pBlock->searchShapes(upperOuterRegion, shapesInUpperOuterRegion);
-        pBlock->searchShapes(bottomOuterRegion, shapesInBottomOuterRegion);
-        std::for_each(shapesInLeftOuterRegion.begin(), shapesInLeftOuterRegion.end(), [](LShape* shape){shape->deselect();});
-        std::for_each(shapesInRightOuterRegion.begin(), shapesInRightOuterRegion.end(), [](LShape* shape){shape->deselect();});
-        std::for_each(shapesInUpperOuterRegion.begin(), shapesInUpperOuterRegion.end(), [](LShape* shape){shape->deselect();});
-        std::for_each(shapesInBottomOuterRegion.begin(), shapesInBottomOuterRegion.end(), [](LShape* shape){shape->deselect();});
+        pBlock->deselectShapesInZone(leftOuterRegion);
+        pBlock->deselectShapesInZone(upperOuterRegion);
+        pBlock->deselectShapesInZone(rightOuterRegion);
+        pBlock->deselectShapesInZone(bottomOuterRegion);
         pBlock->selectShapesInZone(mSelectionBox->getZone());
     }
 }
@@ -54,7 +50,7 @@ void SelectionTool::mouseMoveEvent(QMouseEvent* event, LBlock* pBlock)
 void SelectionTool::mouseReleaseEvent(QMouseEvent* event, LBlock* pBlock)
 {
     if (mSelectionBox) {
-        pBlock->removeVisualEntity(mSelectionBox);
+        pBlock->removeVisualEntityInViewport(mSelectionBox);
         delete mSelectionBox;
         mSelectionBox = nullptr;
     }

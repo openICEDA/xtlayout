@@ -35,35 +35,37 @@ bool LBlock::open(const QString& pFileName)
     {
         //TODO: get class ID and cast to the corresponding class
         xtdb::XtRectangle* xtrect = static_cast<xtdb::XtRectangle*>(*shapeIt);
-        LRectangle* lrect = new LRectangle(xtrect);
-        insertVisualEntity(lrect);
+        LRectangle* lrect = new LRectangle(this);
+        lrect->connectDBObj(xtrect);
+        lrect->syncFromDB();
+        insertVisualEntityInViewport(lrect);
     }
     mCurFile = QFileInfo(pFileName).canonicalFilePath();
     return true;
 }
 
-void LBlock::initVisualEntityPtr()
+void LBlock::initVisualEntityInViewPortPtr()
 {
-    mCurVisualEntityItr = mAllVisualEntities.begin();
+    mCurVisualEntityItr = mVisualEntitiesInViewport.begin();
 }
 
-void LBlock::insertVisualEntity(VisualEntity* pVisualEntity)
+void LBlock::insertVisualEntityInViewport(VisualEntity* pVisualEntity)
 {
-    mAllVisualEntities.insert(pVisualEntity);
+    mVisualEntitiesInViewport.insert(pVisualEntity);
 }
 
-void LBlock::removeVisualEntity(VisualEntity* pVisualEntity)
+void LBlock::removeVisualEntityInViewport(VisualEntity* pVisualEntity)
 {
-    QSet<VisualEntity*>::const_iterator it = mAllVisualEntities.find(pVisualEntity);
-    if (mAllVisualEntities.cend() != it)
+    QSet<VisualEntity*>::const_iterator it = mVisualEntitiesInViewport.find(pVisualEntity);
+    if (mVisualEntitiesInViewport.cend() != it)
     {
-        mAllVisualEntities.erase(it);
+        mVisualEntitiesInViewport.erase(it);
     }
 }
 
-VisualEntity* LBlock::nextVisualEntityPtr()
+VisualEntity* LBlock::nextVisualEntityInViewportPtr()
 {
-    if (mAllVisualEntities.end() == mCurVisualEntityItr)
+    if (mVisualEntitiesInViewport.end() == mCurVisualEntityItr)
     {
         return nullptr;
     }
@@ -100,12 +102,27 @@ void LBlock::selectShapesInZone(const QRect& pZone)
     mSelectedShapes = std::move(foundShapes);
 }
 
+void LBlock::deselectShapesInZone(const QRect& pZone)
+{
+    QSet<LShape*> foundShapes;
+    searchShapes(pZone, foundShapes);
+    std::for_each(foundShapes.begin(), foundShapes.end(), [](LShape* shape){shape->deselect();});
+    mSelectedShapes = std::move(foundShapes);
+}
+
 void LBlock::deleteSelectedShapes()
 {
     std::for_each(mSelectedShapes.begin(), mSelectedShapes.end(), [this](LShape* shape){
-        mAllVisualEntities.remove(shape);
         delete shape;});
-    mSelectedShapes.clear();
+}
+
+void LBlock::removeSelectedShape(LShape* pShape)
+{
+    QSet<LShape*>::const_iterator it = mSelectedShapes.find(pShape);
+    if (mSelectedShapes.cend() != it)
+    {
+        mSelectedShapes.erase(it);
+    }
 }
 
 LBlock::ShapeQuery::ShapeQuery(xtdb::XtBlock* pBlock):xtdb::XtShapeQuery(pBlock)
@@ -113,7 +130,7 @@ LBlock::ShapeQuery::ShapeQuery(xtdb::XtBlock* pBlock):xtdb::XtShapeQuery(pBlock)
 
 }
 
-void LBlock::clearAllVisualEntities()
+void LBlock::clearVisualEntitiesInViewport()
 {
-    mAllVisualEntities.clear();
+    mVisualEntitiesInViewport.clear();
 }

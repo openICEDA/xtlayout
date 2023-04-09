@@ -26,15 +26,15 @@ void RectangleTool::mousePressEvent(QMouseEvent* event, LBlock* pBlock)
     {
         pBlock->getPaintingArea()->setMouseTracking(true);
         mFirstPointFixed = true;
-        mRectangle = new LRectangle;
+        mRectangle = new LRectangle(pBlock);
         mRectangle->setFirstPoint(NavigationTool::viewportCS2WorldCS(event->pos(), pBlock));
         mRectangle->setSecondPoint(NavigationTool::viewportCS2WorldCS(event->pos(), pBlock));
-        pBlock->insertVisualEntity(mRectangle);
+        pBlock->insertVisualEntityInViewport(mRectangle);
     }
     else
     {
         mRectangle->setSecondPoint(NavigationTool::viewportCS2WorldCS(event->pos(), pBlock));
-        mRectangle->storeToDB(pBlock->getBlock());
+        mRectangle->syncToDB();
         pBlock->getPaintingArea()->setMouseTracking(false);
         emit completed();
     }
@@ -63,7 +63,7 @@ void RectangleTool::keyPressEvent(QKeyEvent* event, LBlock* pBlock)
             if (mRectangle)
             {
                 //delete mRectangle, since it is not stored into database yet, no need to destroy
-                pBlock->removeVisualEntity(mRectangle);
+                pBlock->removeVisualEntityInViewport(mRectangle);
                 delete mRectangle;
                 mRectangle = nullptr;
                 mFirstPointFixed = false;

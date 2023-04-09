@@ -6,7 +6,6 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
-#include "commandcontrol.h"
 #include <QSet>
 #include "selectiontool.h"
 #include "tool.h"

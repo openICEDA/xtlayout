@@ -27,8 +27,8 @@ void PaintingArea::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
     VisualEntity* ve;
-    mBlock->initVisualEntityPtr();
-    while ((ve = mBlock->nextVisualEntityPtr()))
+    mBlock->initVisualEntityInViewPortPtr();
+    while ((ve = mBlock->nextVisualEntityInViewportPtr()))
     {
         ve->draw(&painter);
     }
