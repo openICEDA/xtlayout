@@ -71,5 +71,5 @@ void LRectangle::draw(QPainter* pPainter)
     } else {
         pPainter->setBrush(QBrush(QColor(255, 0, 0), Qt::SolidPattern));
     }
-    pPainter->drawRect(NavigationTool::worldCS2ViewportCS(getZone(), static_cast<PaintingArea*>(pPainter->device())));
+    pPainter->drawRect(NavigationTool::worldCS2ViewportCS(getZone(), static_cast<PaintingArea*>(pPainter->device())->getBlock()));
 }

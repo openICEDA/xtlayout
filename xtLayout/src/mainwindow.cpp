@@ -9,7 +9,7 @@
 #include <QToolButton>
 #include <QMdiSubWindow>
 #include <QFileDialog>
-#include "drawcommand.h"
+#include "lblock.h"
 #include "rectangletool.h"
 #include "selectiontool.h"
 #include "navigationtool.h"
@@ -62,14 +62,16 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* event)
     {
         QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
         std::vector<Tool*>& activeTools = getActiveTools();
+        PaintingArea* pa = static_cast<PaintingArea*>(mActivePA->widget());
         for (std::vector<Tool*>::const_iterator it = activeTools.cbegin(); it != activeTools.cend(); it++)
         {
             Tool* tool = *it;
             if (tool)
             {
-                tool->keyPressEvent(keyEvent, static_cast<PaintingArea*>(mActivePA->widget()));
+                tool->keyPressEvent(keyEvent, pa->getBlock());
             }
         }
+        pa->update();
     }
     return false;
 }
@@ -175,7 +177,7 @@ QMdiSubWindow *MainWindow::findMdiChild(const QString& pFileName) const
     for (QMdiSubWindow* window : subWindows)
     {
         PaintingArea* pa = static_cast<PaintingArea*>(window->widget());
-        if (pa->getCurrentFile() == canonicalFilePath)
+        if (pa->getBlock()->getCurrentFile() == canonicalFilePath)
         {
             return window;
         }

@@ -5,7 +5,7 @@
 
 class PaintingArea;
 class QMouseEvent;
-class QPainter;
+class LBlock;
 class QKeyEvent;
 class Tool: public QObject
 {
@@ -19,10 +19,10 @@ public:
     };
     Tool(tool_type pToolType);
     virtual ~Tool(){};
-    virtual void mousePressEvent(QMouseEvent* event, PaintingArea* pPA) = 0;
-    virtual void mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA) = 0;
-    virtual void mouseReleaseEvent(QMouseEvent* event, PaintingArea* pPA) = 0;
-    virtual void keyPressEvent(QKeyEvent* event, PaintingArea* pPA) = 0;
+    virtual void mousePressEvent(QMouseEvent* event, LBlock* pBlock) = 0;
+    virtual void mouseMoveEvent(QMouseEvent* event, LBlock* pBlock) = 0;
+    virtual void mouseReleaseEvent(QMouseEvent* event, LBlock* pBlock) = 0;
+    virtual void keyPressEvent(QKeyEvent* event, LBlock* pBlock) = 0;
     tool_type getToolType(){return mToolType;};
 protected:
     tool_type mToolType;

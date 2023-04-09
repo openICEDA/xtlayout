@@ -10,7 +10,7 @@
 
 
 class QMouseEvent;
-class PaintingArea;
+class LBlock;
 class NavigationTool;
 class RectangleTool : public Tool
 {
@@ -22,10 +22,10 @@ private:
 public:
     RectangleTool(PaintingArea* pPA);
     ~RectangleTool() override;
-    void mousePressEvent(QMouseEvent* event, PaintingArea* pPA) override;
-    void mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA) override;
-    void mouseReleaseEvent(QMouseEvent* event, PaintingArea* pPA) override;
-    void keyPressEvent(QKeyEvent* event, PaintingArea* pPA) override;
+    void mousePressEvent(QMouseEvent* event, LBlock* pBlock) override;
+    void mouseMoveEvent(QMouseEvent* event, LBlock* pBlock) override;
+    void mouseReleaseEvent(QMouseEvent* event, LBlock* pBlock) override;
+    void keyPressEvent(QKeyEvent* event, LBlock* pBlock) override;
 signals:
     void completed();
 };

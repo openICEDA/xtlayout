@@ -16,5 +16,5 @@ void SelectionBox::draw(QPainter* pPainter)
     pen.setBrush(QBrush(QColor(0,0,0,255)));
     pPainter->setPen(pen);
     pPainter->setBrush(QColor(0,0,0,0));
-    pPainter->drawRect(NavigationTool::worldCS2ViewportCS(getZone(), static_cast<PaintingArea*>(pPainter->device())));
+    pPainter->drawRect(NavigationTool::worldCS2ViewportCS(getZone(), static_cast<PaintingArea*>(pPainter->device())->getBlock()));
 }

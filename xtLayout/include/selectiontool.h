@@ -12,15 +12,14 @@ class SelectionTool : public Tool
 private:
     bool mIsPressed;
     QPoint mFirstPointViewportCS;
-    QSet<LShape*> mSelectedObjs;
     SelectionBox* mSelectionBox;
 public:
     SelectionTool();
     ~SelectionTool() override;
-    void mousePressEvent(QMouseEvent* event, PaintingArea* pPA) override;
-    void mouseMoveEvent(QMouseEvent* event, PaintingArea* pPA) override;
-    void mouseReleaseEvent(QMouseEvent* event, PaintingArea* pPA) override;
-    void keyPressEvent(QKeyEvent* event, PaintingArea* pPA) override;
+    void mousePressEvent(QMouseEvent* event, LBlock* pBlock) override;
+    void mouseMoveEvent(QMouseEvent* event, LBlock* pBlock) override;
+    void mouseReleaseEvent(QMouseEvent* event, LBlock* pBlock) override;
+    void keyPressEvent(QKeyEvent* event, LBlock* pBlock) override;
     bool isPressed(){return mIsPressed;};
 };
 
