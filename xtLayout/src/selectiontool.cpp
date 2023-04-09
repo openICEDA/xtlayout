@@ -36,9 +36,9 @@ void SelectionTool::mouseMoveEvent(QMouseEvent* event, LBlock* pBlock)
         QSet<LShape*> shapesInUpperOuterRegion;
         QSet<LShape*> shapesInBottomOuterRegion;
         QRect leftOuterRegion(NavigationTool::viewportCS2WorldCS({0, 0}, pBlock), NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), pBlock->getViewport().height()}, pBlock));
-        QRect rightOuterRegion(NavigationTool::viewportCS2WorldCS({secondpnt.x(), 0}, pBlock), NavigationTool::viewportCS2WorldCS({pBlock->getViewport().width(), pBlock->getViewport().height()}, pBlock));
-        QRect upperOuterRegion(NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), 0}, pBlock), NavigationTool::viewportCS2WorldCS({secondpnt.x(), mFirstPointViewportCS.y()}, pBlock));
-        QRect bottomOuterRegion(NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), secondpnt.y()}, pBlock), NavigationTool::viewportCS2WorldCS({secondpnt.x(), pBlock->getViewport().height()}, pBlock));
+        QRect rightOuterRegion(NavigationTool::viewportCS2WorldCS({event->pos().x(), 0}, pBlock), NavigationTool::viewportCS2WorldCS({pBlock->getViewport().width(), pBlock->getViewport().height()}, pBlock));
+        QRect upperOuterRegion(NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), 0}, pBlock), NavigationTool::viewportCS2WorldCS({event->pos().x(), mFirstPointViewportCS.y()}, pBlock));
+        QRect bottomOuterRegion(NavigationTool::viewportCS2WorldCS({mFirstPointViewportCS.x(), event->pos().y()}, pBlock), NavigationTool::viewportCS2WorldCS({event->pos().x(), pBlock->getViewport().height()}, pBlock));
         pBlock->searchShapes(leftOuterRegion, shapesInLeftOuterRegion);
         pBlock->searchShapes(rightOuterRegion, shapesInRightOuterRegion);
         pBlock->searchShapes(upperOuterRegion, shapesInUpperOuterRegion);
