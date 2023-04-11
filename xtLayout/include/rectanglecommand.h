@@ -7,9 +7,14 @@ class LRectangle;
 class RectangleCommand : public QUndoCommand
 {
 private:
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+    LBlock* mBlock;
     LRectangle* mRect;
 public:
-    RectangleCommand(int pX1, int pY1, int pX2, int pY2, LBlock* pBlock);
+    RectangleCommand(LRectangle* pRect);
     void undo() override;
     void redo() override;
 };

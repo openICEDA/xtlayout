@@ -23,5 +23,6 @@ public:
     bool saveFile(const QString& pFileName);
     bool loadFile(const QString& pFileName);
     LBlock* getBlock() {return mBlock;};
+    MainWindow* getMainWindow() {return mMainWindow;};
 };
 #endif // PAINTINGAREA_H

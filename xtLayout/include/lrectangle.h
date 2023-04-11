@@ -30,6 +30,7 @@ public:
     void setFirstPoint(const QPoint& pPoint);
     void setSecondPoint(const QPoint& pPoint);
     QRect getZone();
+    LBlock* getBlock(){return mBlock;};
 };
 
 #endif // LRECTANGLE_H

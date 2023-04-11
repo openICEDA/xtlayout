@@ -1,17 +1,34 @@
 #include "rectanglecommand.h"
 #include "lrectangle.h"
 #include "lblock.h"
+#include "paintingarea.h"
+#include <QDebug>
 
-RectangleCommand::RectangleCommand(int pX1, int pY1, int pX2, int pY2, LBlock* pBlock):mRect(new LRectangle(pX1, pY1, pX2, pY2, pBlock))
+RectangleCommand::RectangleCommand(LRectangle* pRect):mRect(pRect)
 {
+    mBlock = pRect->getBlock();
+    x1 = pRect->x1;
+    y1 = pRect->y1;
+    x2 = pRect->x2;
+    y2 = pRect->y2;
 }
 
 void RectangleCommand::undo()
 {
-    delete mRect;
+    if (mRect)
+    {
+        delete mRect;
+        mRect = nullptr;
+    }
+    mBlock->getPaintingArea()->update();
 }
 
 void RectangleCommand::redo()
 {
-
+    if (!mRect)
+    {
+        mRect = new LRectangle(x1, y1, x2, y2, mBlock);
+        mBlock->insertVisualEntityInViewport(mRect);
+    }
+    mBlock->getPaintingArea()->update();
 }

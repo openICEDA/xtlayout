@@ -10,7 +10,6 @@
 #include <QFileDialog>
 #include <QGuiApplication>
 
-
 PaintingArea::PaintingArea(QWidget* pMainWindow)
     : QWidget{pMainWindow}, mMainWindow(static_cast<MainWindow*>(pMainWindow)), mBlock(new LBlock(this, pMainWindow->geometry().width(), pMainWindow->geometry().height()))
 {

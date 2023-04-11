@@ -9,14 +9,18 @@
 #include <QToolButton>
 #include <QMdiSubWindow>
 #include <QFileDialog>
+#include <QUndoStack>
 #include "lblock.h"
 #include "rectangletool.h"
 #include "selectiontool.h"
 #include "navigationtool.h"
 #include "xtdb.h"
+#include "rectanglecommand.h"
+#include "lrectangle.h"
+
 using namespace xtdb;
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), mActivePA(nullptr)
+    : QMainWindow(parent), ui(new Ui::MainWindow), mActivePA(nullptr), mUndoAction(nullptr), mRedoAction(nullptr)
 {
     ui->setupUi(this);
     ui->menubar->setVisible(true);
@@ -28,6 +32,19 @@ MainWindow::MainWindow(QWidget* parent)
     rectToolButton->setText("Rectangle");
     rectToolButton->setShortcut(QKeySequence("R"));
     connect(rectToolButton, SIGNAL(clicked()), this, SLOT(newRectangleTool()));
+
+    //TODO: figure out how to put into .ui
+    mUndoStack = new QUndoStack(this);
+
+    mUndoAction = mUndoStack->createUndoAction(this, tr("&Undo"));
+    mUndoAction->setShortcuts(QKeySequence::Undo);
+
+    mRedoAction = mUndoStack->createRedoAction(this, tr("&Redo"));
+    mRedoAction->setShortcuts(QKeySequence::Redo);
+
+    ui->menuEdit->addAction(mUndoAction);
+    ui->menuEdit->addAction(mRedoAction);
+
     qApp->installEventFilter(this);
     setFocusPolicy(Qt::StrongFocus);
 
@@ -46,14 +63,16 @@ void MainWindow::newRectangleTool()
         RectangleTool* rectangleTool = new RectangleTool(static_cast<PaintingArea*>(mActivePA->widget()));
         activateTool(rectangleTool);
         deactivateTool(Tool::SELECTION_TOOL);
-        connect(rectangleTool, SIGNAL(completed()), this, SLOT(switchBackToSelectionTool()));
+        connect(rectangleTool, SIGNAL(completed(LRectangle*)), this, SLOT(onRectangleToolComplete(LRectangle*)));
     }
 }
 
-void MainWindow::switchBackToSelectionTool()
+void MainWindow::onRectangleToolComplete(LRectangle* pRect)
 {
+    mUndoStack->push(new RectangleCommand(pRect));
     deactivateTool(Tool::RECTANGLE_TOOL);
     activateTool(new SelectionTool);
+    mActivePA->update();
 }
 
 bool MainWindow::eventFilter(QObject* obj, QEvent* event)

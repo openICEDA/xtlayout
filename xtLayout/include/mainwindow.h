@@ -15,19 +15,24 @@ class PaintingArea;
 class Shape;
 class NavigationTool;
 class QMdiSubWindow;
+class LRectangle;
+class QUndoStack;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private:
     Ui::MainWindow* ui;
     QMdiSubWindow* mActivePA;
-    QMenu* file_menu;
     std::vector<Tool*> mActiveTools;
+    QAction* mUndoAction;
+    QAction* mRedoAction;
+    QUndoStack* mUndoStack;
 private:
     void activateTool(Tool* pTool);
     void deactivateTool(Tool::tool_type pTool);
     Tool* findActiveTool(Tool::tool_type pTool);
 public:
+    QUndoStack* getUndoStack(){return mUndoStack;};
     PaintingArea* createPaintingArea();
     bool openFile(const QString& pFileName);
     QMdiSubWindow* findMdiChild(const QString &fileName) const;
@@ -40,7 +45,7 @@ public:
     ~MainWindow();
 public slots:
     void newRectangleTool();
-    void switchBackToSelectionTool();
+    void onRectangleToolComplete(LRectangle* pRect);
     void updateActivePA(QMdiSubWindow* pActivePA);
 private slots:
     void on_actionNew_triggered();

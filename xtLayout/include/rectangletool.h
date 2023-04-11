@@ -27,7 +27,7 @@ public:
     void mouseReleaseEvent(QMouseEvent* event, LBlock* pBlock) override;
     void keyPressEvent(QKeyEvent* event, LBlock* pBlock) override;
 signals:
-    void completed();
+    void completed(LRectangle*);
 };
 
 #endif // RECTANGLETOOL_H

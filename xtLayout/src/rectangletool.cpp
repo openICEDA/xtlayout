@@ -8,6 +8,10 @@
 #include "lrectangle.h"
 #include <iostream>
 #include "paintingarea.h"
+#include "rectanglecommand.h"
+#include "mainwindow.h"
+#include <QUndoStack>
+#include "rectanglecommand.h"
 
 using namespace xtdb;
 RectangleTool::RectangleTool(PaintingArea* pBlock):mFirstPointFixed(false), Tool(RECTANGLE_TOOL), mRectangle(nullptr)
@@ -34,9 +38,10 @@ void RectangleTool::mousePressEvent(QMouseEvent* event, LBlock* pBlock)
     else
     {
         mRectangle->setSecondPoint(NavigationTool::viewportCS2WorldCS(event->pos(), pBlock));
+//       pBlock->getPaintingArea()->getMainWindow()->getUndoStack()->push(new RectangleCommand(mRectangle));
         mRectangle->syncToDB();
-        pBlock->getPaintingArea()->setMouseTracking(false);
-        emit completed();
+        pBlock->getPaintingArea()->setMouseTracking(false);        
+        emit completed(mRectangle);
     }
 }
 
