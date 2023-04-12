@@ -5,11 +5,11 @@
 #include "paintingarea.h"
 #include "lblock.h"
 
-LRectangle::LRectangle(LBlock* pBlock):x1(0), y1(0), x2(0), y2(0), mBlock(pBlock)
+LRectangle::LRectangle(LBlock* pBlock):x1(0), y1(0), x2(0), y2(0), mRect(nullptr), mBlock(pBlock)
 {
 }
 
-LRectangle::LRectangle(int pX1, int pY1, int pX2, int pY2, LBlock* pBlock):x1(pX1), y1(pY1), x2(pX2), y2(pY2), mBlock(pBlock)
+LRectangle::LRectangle(int pX1, int pY1, int pX2, int pY2, LBlock* pBlock):x1(pX1), y1(pY1), x2(pX2), y2(pY2), mRect(nullptr), mBlock(pBlock)
 {
 }
 

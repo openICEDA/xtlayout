@@ -28,6 +28,7 @@ void RectangleCommand::redo()
     if (!mRect)
     {
         mRect = new LRectangle(x1, y1, x2, y2, mBlock);
+        mRect->syncToDB();
         mBlock->insertVisualEntityInViewport(mRect);
     }
     mBlock->getPaintingArea()->update();
