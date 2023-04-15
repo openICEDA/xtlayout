@@ -48,6 +48,7 @@ public:
     void initSelectedShapePtr();
     bool nextSelectedShape();
     void deleteSelectedShapes();
+    bool moveSelectedShapes();
     void removeSelectedShape(LShape* pShape);
 
     void searchShapes(const QRect& pZone, QSet<LShape*>& pFoundShapes, bool ONLY_FULLY_CONTAINED = false);

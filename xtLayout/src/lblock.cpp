@@ -125,6 +125,20 @@ void LBlock::removeSelectedShape(LShape* pShape)
     }
 }
 
+bool LBlock::moveSelectedShapes()
+{
+    bool moveSuccess = true;
+    std::for_each(
+        mSelectedShapes.begin(),
+        mSelectedShapes.end(),
+        [this](LShape* shape)
+        {
+            (void)shape;
+        }
+    );
+    return moveSuccess;
+}
+
 LBlock::ShapeQuery::ShapeQuery(xtdb::XtBlock* pBlock):xtdb::XtShapeQuery(pBlock)
 {
 
